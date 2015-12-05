@@ -20,9 +20,24 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>com.impossibl.pgjdbc-ng</groupId>
+            <artifactId>pgjdbc-ng</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <dependency>
             <groupId>io.duality</groupId>
             <artifactId>duality_${scala.compat.version}</artifactId>
             <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.spire-math</groupId>
+            <artifactId>spire_2.11</artifactId>
+            <version>0.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.8.11.2</version>
         </dependency>
     </dependencies>
 
