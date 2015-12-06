@@ -3,7 +3,7 @@ import io.duality.PersistableSet
 /**
   * Created by katja on 05/12/15.
   */
-class GraphDynamicFields(values: Map[String, Any]) {
+class GraphDynamicProperties(values: Map[String, Any]) {
 
   val fieldNames = Set(
       // Boolean
@@ -18,7 +18,7 @@ class GraphDynamicFields(values: Map[String, Any]) {
       // Double
       "lovasz_theta")
 
-  val fields = new PersistableSet[DatabaseField[Any]]
-  fieldNames.foreach(fieldName => fields += new DatabaseField(fieldName, values.get(fieldName)))
+  val fields = new PersistableSet[DynamicProperty[Any]]
+  fieldNames.foreach(fieldName => fields += new DynamicProperty(fieldName, values.get(fieldName)))
 
 }

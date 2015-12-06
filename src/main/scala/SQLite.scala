@@ -12,6 +12,10 @@ class SQLite(dbName: String) {
 
   val graphTableName = "graph"
   val graphColumns = getColumns(graphTableName)
+  val graphColumnNamesByIds = graphColumns.map(field => (field.id, field.name)).toMap
+
+  def graphColumnIdToName(id: Int): Option[String] = graphColumnNamesByIds.get(id)
+
 
   def getColumns(tableName: String): Seq[SQLiteField] = {
     var fields = Seq.newBuilder[SQLiteField]
@@ -38,4 +42,6 @@ class SQLite(dbName: String) {
     }
     rows.result
   }
+
+  def getAllGraphs: Set[Map[String, Any]] = getAllRows(graphTableName).map(m => m.map(f => (graphColumnIdToName(f._1).get, f._2)))
 }

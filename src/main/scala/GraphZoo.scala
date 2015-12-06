@@ -13,6 +13,11 @@ object GraphZoo {
     db.connectRoot(this)
 
     val sqliteDB = new SQLite("graphzoo.db")
+//    sqliteDB.getAllGraphs.foreach(m => println(m.get("data").get))
+
+    Util.parseSparse6(":OeGKjB_YoW@gahssJgVQoWz")
+
+
 
     val adjacenciesString = "[[0,1], [1, 2], [2,0]]"
     val graph = new RegularGraph(Util.buildAdjacencyList(adjacenciesString))
