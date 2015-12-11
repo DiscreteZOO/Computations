@@ -15,20 +15,18 @@ object GraphZoo {
     val sqliteDB = new SQLite("graphzoo.db")
 //    sqliteDB.getAllGraphs.foreach(m => println(m.get("data").get))
 
-    Util.parseSparse6(":OeGKjB_YoW@gahssJgVQoWz")
-
-
+    new String6(":OeGKjB_YoW@gahssJgVQoWz").parse
 
     val adjacenciesString = "[[0,1], [1, 2], [2,0]]"
     val graph = new RegularGraph(Util.buildAdjacencyList(adjacenciesString))
-    println(graph)
+//    println(graph)
 
 
     val multigraph = GraphFamilies.doubleCycle(3)
-    println(multigraph)
+//    println(multigraph)
 
     val px = GraphFamilies.praegerXu(3, 1)
-    println(px)
+//    println(px)
 
     val v1 = new Vertex
     val v2 = new Vertex

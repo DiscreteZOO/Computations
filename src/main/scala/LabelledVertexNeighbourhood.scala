@@ -1,7 +1,7 @@
 /**
   * Created by katja on 17/11/15.
   */
-class LabelledVertexNeighbourhood(val label: Int) extends Vertex with VertexNeighbours[LabelledVertexNeighbourhood] {
+class LabelledVertexNeighbourhood(val label: Long) extends Vertex with VertexNeighbours[LabelledVertexNeighbourhood] {
 
   override def toString = s"$label: $neighboursString"
   def sortedNeighbours = neighbours.toSeq.sortWith(_.label < _.label)

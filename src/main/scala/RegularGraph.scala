@@ -1,7 +1,7 @@
 /**
   * Created by katja on 17/11/15.
   */
-class RegularGraph(adjacencies: Map[Int, LabelledVertexNeighbourhood]) extends Graph(adjacencies) {
+class RegularGraph(adjacencies: Map[Long, LabelledVertexNeighbourhood]) extends Graph(adjacencies) {
 
   require(minDegree == maxDegree, "The input is not a regular graph")
 

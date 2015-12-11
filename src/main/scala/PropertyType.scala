@@ -8,6 +8,7 @@ object PropertyType {
   case object BooleanPropertyType extends PropertyType
   case object DoublePropertyType extends PropertyType
   case object IntegerPropertyType extends PropertyType
+  case object RationalPropertyType extends PropertyType
   case object StringPropertyType extends PropertyType
 
 }
