@@ -1,4 +1,4 @@
-import io.duality.{Database, PersistableSet}
+import io.duality.{PersistableSet, Database}
 
 /**
  * Created by katja on 20/08/15.
@@ -6,20 +6,27 @@ import io.duality.{Database, PersistableSet}
 
 object GraphZoo {
 
-  val graphs = new PersistableSet[Graph]
+  val graphs = new PersistableSet[Graph] // anything inherited from Graph?
 
   def main (args: Array[String]) {
     val db = new Database("jdbc:pgsql://localhost:5432/graphzoo?user=graphzoo&password=gr4ph!Z00")
     db.connectRoot(this)
 
     val sqliteDB = new SQLite("graphzoo.db")
-//    sqliteDB.getAllGraphs.foreach(m => println(m.get("data").get))
+    sqliteDB.getAllGraphs.foreach(m => {
+      if (m.get("size").get == 60) {
+        val g = new Graph(new String6(m.get("data").get.toString).parse)
+        println(g.description)
+        DynamicProperties.booleanProperties.foreach(p => {
 
-    new String6(":OeGKjB_YoW@gahssJgVQoWz").parse
+        })
+      }
+    })
 
     val adjacenciesString = "[[0,1], [1, 2], [2,0]]"
     val graph = new RegularGraph(Util.buildAdjacencyList(adjacenciesString))
 //    println(graph)
+
 
 
     val multigraph = GraphFamilies.doubleCycle(3)

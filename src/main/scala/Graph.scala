@@ -7,6 +7,7 @@
 class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood]) {
 
   val order = adjacencies.size
+//  val dynamicProperties = new PersistableSet[DynamicPropertyValue]
 
   def description = s"An undirected graph of order $order."
   def minDegree = adjacencies.mapValues(_.degree).values.min
