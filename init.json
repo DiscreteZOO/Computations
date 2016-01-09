@@ -1,14 +1,31 @@
 {
-  "dynamicProperties": {
-    "boolean": ["is_arc_transitive", "is_asteroidal_triple_free", "is_bipartite", "is_cartesian_product", "is_cayley", "is_chordal", "is_circulant",
-    "is_circular_planar", "is_distance_regular", "is_distance_transitive", "is_edge_transitive", "is_eulerian", "is_even_hole_free", "is_forest", "is_gallai_tree",
-    "is_hamiltonian", "is_interval", "is_line_graph", "is_long_antihole_free", "is_long_hole_free", "is_odd_hole_free", "is_overfull", "is_perfect", "is_prime",
-    "is_regular", "is_split", "is_strongly_regular", "is_tree", "is_vertex_transitive", "has_multiple_edges"],
-    "integer": ["chromatic_index", "chromatic_number", "clique_number", "connected_components_number", "diameter",
-    "edge_connectivity", "fractional_chromatic_index", "genus", "girth", "number_of_loops", "odd_girth", "radius", "size",
-    "spanning_trees_count", "szeged_index", "triangles_count", "treewidth", "vertex_connectivity", "wiener_index", "zagreb1_index",
-    "zagreb2_index"],
-    "double": ["lovasz_theta"],
-    "rational": ["average_degree", "average_distance", "cluster_transitivity", "clustering_average", "density", "maximum_average_degree"]
+  "Graph": {
+    "properties": [
+      {
+        "type": "Boolean",
+        "list": ["has_multiple_edges", "is_arc_transitive", "is_asteroidal_triple_free", "is_bipartite", "is_cartesian_product", "is_cayley", "is_chordal",
+          "is_circulant", "is_circular_planar", "is_distance_regular", "is_distance_transitive", "is_edge_transitive", "is_eulerian", "is_even_hole_free",
+          "is_forest", "is_gallai_tree", "is_hamiltonian", "is_interval", "is_line_graph", "is_long_antihole_free", "is_long_hole_free", "is_odd_hole_free",
+          "is_overfull", "is_perfect", "is_prime", "is_regular", "is_split", "is_strongly_regular", "is_tree", "is_vertex_transitive"]
+      },
+      {
+        "type": "Double",
+        "list": ["lovasz_theta"]
+      },
+      {
+        "type": "Integer",
+        "list": ["chromatic_index", "chromatic_number", "clique_number", "connected_components_number", "diameter", "edge_connectivity",
+          "fractional_chromatic_index", "genus", "girth", "number_of_loops", "odd_girth", "order", "radius", "size", "spanning_trees_count",
+          "szeged_index", "triangles_count", "treewidth", "vertex_connectivity", "wiener_index", "zagreb1_index", "zagreb2_index"]
+      },
+      {
+        "type": "Rational",
+        "list": ["average_degree", "average_distance", "cluster_transitivity", "clustering_average", "density", "maximum_average_degree"]
+      },
+      {
+        "type": "String",
+        "list": []
+      }
+    ]
   }
 }

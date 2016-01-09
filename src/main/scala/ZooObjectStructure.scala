@@ -1,11 +1,16 @@
+import java.sql.ResultSet
 import io.duality.PersistableSet
 
 /**
   * Created by katja on 03/01/16.
   */
-trait ZooObjectStructure {
+abstract class ZooObjectStructure[T <: ZooObject] {
 
   val name: String
-  val dynamicProperties: PersistableSet[DynamicProperty[Any]]
+  val tableSQLite: String
+  lazy val properties = InitFileParser.getProperties(name)
+
+  def constructFromSQLite(resultSet: ResultSet): T
+  def persistableSet = new PersistableSet[T]
 
 }

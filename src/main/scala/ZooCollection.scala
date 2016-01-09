@@ -1,16 +1,30 @@
-import io.duality.PersistableSet
+import io.duality.TransactionManager.atomic
 
 /**
   * Created by katja on 02/01/16.
   */
-class ZooCollection[T] {
 
-  val persistableSet = new PersistableSet[T]
+class ZooCollection(val zooObjectStructure: ZooObjectStructure[_]) {
 
-  val booleanProperties = new DynamicPropertySet(PropertyType.BooleanPropertyType)
-  val doubleProperties = new DynamicPropertySet(PropertyType.DoublePropertyType)
-  val integerProperties = new DynamicPropertySet(PropertyType.IntegerPropertyType)
-  val rationalProperties = new DynamicPropertySet(PropertyType.RationalPropertyType)
-  val stringProperties = new DynamicPropertySet(PropertyType.StringPropertyType)
+  val persistableSet = zooObjectStructure.persistableSet
+
+  def updateFromSQLite(db: SQLite): Unit = {
+
+    val table = new SQLiteTable(db, zooObjectStructure)
+
+    table.next
+    println(table.get)
+
+    atomic {
+//      while (table.next) {
+//
+//      }
+    }
+
+//    check if graph exists in database via canonical labelling
+//    if not, insert
+//    else compare properties, update if necessary
+
+  }
 
 }

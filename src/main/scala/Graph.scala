@@ -1,13 +1,13 @@
+import java.sql.ResultSet
 
 
 /**
  * Created by katja on 10/11/15.
  */
 
-class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood]) {
+class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood]) extends ZooObject {
 
   val order = adjacencies.size
-//  val dynamicProperties = new PersistableSet[DynamicPropertyValue]
 
   def description = s"An undirected graph of order $order."
   def minDegree = adjacencies.mapValues(_.degree).values.min
@@ -26,11 +26,14 @@ class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood]) {
     val orderedAdjacencies = adjacencies.values.toSeq.sortWith(_.label < _.label)
     orderedAdjacencies.foldLeft(s"$description\n")((a, b) => s"$a${b.toString}\n")
   }
-  
-  // fields
 
-//  val data: String = ??? // unique
-//  val name: String = ??? // unique
-//  val unique_id: String = ??? // unique
+}
+
+object Graph extends ZooObjectStructure[Graph] {
+
+  val name = "Graph" // for JSON
+  val tableSQLite = "graph"
+
+  def constructFromSQLite(resultSet: ResultSet) = new Graph(new String6(resultSet.getString("data")).parse)
 
 }
