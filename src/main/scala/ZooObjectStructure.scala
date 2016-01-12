@@ -8,7 +8,7 @@ abstract class ZooObjectStructure[T <: ZooObject] {
 
   val name: String
   val tableSQLite: String
-  lazy val properties = InitFileParser.getProperties(name)
+  val properties: PersistableSet[Property[_]]
 
   def constructFromSQLite(resultSet: ResultSet): T
   def persistableSet = new PersistableSet[T]
