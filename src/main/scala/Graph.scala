@@ -33,6 +33,7 @@ object Graph extends ZooObjectStructure[Graph] {
 
   val name = "Graph" // for JSON
   val tableSQLite = "graph"
+  val properties = InitFileParser.getProperties(name)
 
   def constructFromSQLite(resultSet: ResultSet) = new Graph(new String6(resultSet.getString("data")).parse)
 

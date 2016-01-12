@@ -13,12 +13,10 @@ class ZooCollection(val zooObjectStructure: ZooObjectStructure[_]) {
     val table = new SQLiteTable(db, zooObjectStructure)
 
     table.next
-    println(table.get)
+    val t = table.get
 
     atomic {
-//      while (table.next) {
-//
-//      }
+      println(zooObjectStructure.properties.head.propertyType == PropertyType.BooleanPropertyType)
     }
 
 //    check if graph exists in database via canonical labelling

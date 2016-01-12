@@ -17,6 +17,8 @@ object Main {
     db.connectRoot(this)
     graphs.updateFromSQLite(sqliteDB)
 
+    println(Graph.properties.head.propertyType == PropertyType.BooleanPropertyType)
+
     atomic {
 //      println(Graph.dynamicProperties)
       // transaction
