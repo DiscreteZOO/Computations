@@ -15,8 +15,8 @@
             <version>${scala.version}</version>
         </dependency>
         <dependency>
-            <groupId>graphzoo</groupId>
-            <artifactId>nauty-scala</artifactId>
+            <groupId>xyz.discretezoo.snauty</groupId>
+            <artifactId>snauty</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
