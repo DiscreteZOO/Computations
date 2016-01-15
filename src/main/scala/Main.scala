@@ -12,12 +12,9 @@ object Main {
   def main (args: Array[String]) {
 
     val db = new Database("jdbc:pgsql://localhost:5432/graphzoo?user=graphzoo&password=gr4ph!Z00")
-    val sqliteDB = new SQLite("graphzoo.db")
 
     db.connectRoot(this)
-    graphs.updateFromSQLite(sqliteDB)
-
-    println(Graph.properties.head.propertyType == PropertyType.BooleanPropertyType)
+    graphs.updateFromSQLite
 
     atomic {
 //      println(Graph.dynamicProperties)

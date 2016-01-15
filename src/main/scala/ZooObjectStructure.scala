@@ -4,7 +4,7 @@ import io.duality.PersistableSet
 /**
   * Created by katja on 03/01/16.
   */
-abstract class ZooObjectStructure[T <: ZooObject] {
+trait ZooObjectStructure[T <: ZooObject] {
 
   val name: String
   val tableSQLite: String

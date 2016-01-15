@@ -1,7 +1,7 @@
 /**
   * Created by katja on 17/11/15.
   */
-class RegularGraph(adjacencies: Map[Long, LabelledVertexNeighbourhood]) extends Graph(adjacencies) {
+class RegularGraph(adjacencies: Map[Long, LabelledVertexNeighbourhood], uniqueId: String) extends Graph(adjacencies, uniqueId) {
 
   require(minDegree == maxDegree, "The input is not a regular graph")
 

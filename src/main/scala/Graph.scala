@@ -1,11 +1,12 @@
 import java.sql.ResultSet
 
+import xyz.discretezoo.core.io.{String6, InitFileParser}
 
 /**
  * Created by katja on 10/11/15.
  */
 
-class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood]) extends ZooObject {
+class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood], val uniqueId: String) extends ZooObject {
 
   val order = adjacencies.size
 
@@ -35,6 +36,9 @@ object Graph extends ZooObjectStructure[Graph] {
   val tableSQLite = "graph"
   val properties = InitFileParser.getProperties(name)
 
-  def constructFromSQLite(resultSet: ResultSet) = new Graph(new String6(resultSet.getString("data")).parse)
+  def constructFromSQLite(resultSet: ResultSet) = {
+    println(resultSet.getInt("zooid"))
+    new Graph(new String6(resultSet.getString("data")).parse, resultSet.getString("unique_id"))
+  }
 
 }
