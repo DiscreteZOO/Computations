@@ -17,7 +17,7 @@ class ZooCollection[T <: ZooObject](val zooObjectStructure: ZooObjectStructure[T
     table.next
 //    while (table.next) {
     val obj = table.get()
-    persistableSet += obj
+//    persistableSet += obj
 //    }
 
     table.close

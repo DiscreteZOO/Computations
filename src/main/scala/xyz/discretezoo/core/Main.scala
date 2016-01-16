@@ -1,8 +1,8 @@
 package xyz.discretezoo.core
 
-import io.duality.Database
+import io.duality.{PersistableSet, Database}
 import io.duality.TransactionManager.atomic
-import xyz.discretezoo.core.graphs.Graph
+import xyz.discretezoo.core.graphs.{LabelledVertexNeighbourhood, Graph}
 
 /**
  * Created by katja on 20/08/15.
