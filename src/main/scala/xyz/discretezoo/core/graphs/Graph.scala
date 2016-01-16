@@ -46,7 +46,7 @@ object Graph extends ZooObjectStructure[Graph] {
     println(initJSON.apply("Graph").apply("properties").apply(0).apply("list"))
   }
 
-  def constructFromSQLite(resultSet: ResultSet) = {
+  def constructFromSQLite(resultSet: ResultSet): Graph = {
     println(resultSet.getInt("zooid"))
     new Graph(new String6(resultSet.getString("data")).parse, resultSet.getString("unique_id"))
   }

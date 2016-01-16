@@ -1,8 +1,7 @@
 package xyz.discretezoo.core
 
 import java.sql.ResultSet
-
-import _root_.io.duality.PersistableSet
+import io.duality.PersistableSet
 
 /**
   * Created by katja on 03/01/16.

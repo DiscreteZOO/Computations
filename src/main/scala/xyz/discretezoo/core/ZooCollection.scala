@@ -6,7 +6,7 @@ import externalformats.SQLiteTable
   * Created by katja on 02/01/16.
   */
 
-class ZooCollection(val zooObjectStructure: ZooObjectStructure[_]) {
+class ZooCollection[T <: ZooObject](val zooObjectStructure: ZooObjectStructure[T]) {
 
   val persistableSet = zooObjectStructure.persistableSet
 
@@ -14,10 +14,11 @@ class ZooCollection(val zooObjectStructure: ZooObjectStructure[_]) {
 
     val table = new SQLiteTable("graphzoo.db", zooObjectStructure)
 
-    while (table.next) {
-      val obj = table.get()
-//      persistableSet += obj
-    }
+    table.next
+//    while (table.next) {
+    val obj = table.get()
+    persistableSet += obj
+//    }
 
     table.close
 //    check if graph exists in database via canonical labelling

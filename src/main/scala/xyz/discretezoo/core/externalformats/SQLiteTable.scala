@@ -3,13 +3,12 @@ package xyz.discretezoo.core.externalformats
 import java.sql.{DriverManager, Statement}
 
 import io.duality.TransactionManager.atomic
-import xyz.discretezoo.core.{Property, PropertyValue, ZooObjectStructure}
-import xyz.discretezoo.core.graphs.Graph
+import xyz.discretezoo.core.{ZooObject, Property, PropertyValue, ZooObjectStructure}
 
 /**
   * Created by katja on 08/01/16.
   */
-class SQLiteTable(dbName: String, zooObjectStructure: ZooObjectStructure[_]) {
+class SQLiteTable[T <: ZooObject](dbName: String, zooObjectStructure: ZooObjectStructure[T]) {
 
   private val connection = DriverManager.getConnection(s"jdbc:sqlite:$dbName")
   private val statement: Statement = connection.createStatement()
@@ -22,10 +21,9 @@ class SQLiteTable(dbName: String, zooObjectStructure: ZooObjectStructure[_]) {
 
   def next = rowIterator.next()
 
-  def get(): Graph = {
+  def get(): T = {
 
-    val obj = Graph.constructFromSQLite(rowIterator)
-
+    val obj = zooObjectStructure.constructFromSQLite(rowIterator)
 
     atomic {
       zooObjectStructure.properties.foreach(property => {
