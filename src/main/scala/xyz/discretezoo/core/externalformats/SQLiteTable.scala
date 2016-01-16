@@ -18,32 +18,14 @@ class SQLiteTable(dbName: String, zooObjectStructure: ZooObjectStructure[_]) {
 
   private val results = statement.executeQuery(s"PRAGMA table_info('${zooObjectStructure.tableSQLite}');") // cid, name, type, notnull, dflt_value, pk
 
-  def getUniqueId(zooId: Int): String = {
-//    val uniqueIdQuery = connection.createStatement()
-//    try {
-//      uniqueIdQuery.setQueryTimeout(30)
-//      val result = uniqueIdQuery.executeQuery(s"SELECT unique_id FROM 'object' WHERE zooid = '$zooId';")
-//      println(result.getString("unique_id"))
-//      result.getString("unique_id")
-//
-//    }
-//    catch {
-//      case e: Exception => println("Some exception");
-//    } finally {
-//      uniqueIdQuery.close
-//      ""
-//    }
-    ""
-  }
-
-//  second part
-
   private val rowIterator = statement.executeQuery(s"SELECT * FROM ${zooObjectStructure.tableSQLite} JOIN object ON ${zooObjectStructure.tableSQLite}.zooid = object.zooid;")
 
   def next = rowIterator.next()
 
-  def get = {
+  def get(): Graph = {
+
     val obj = Graph.constructFromSQLite(rowIterator)
+
 
     atomic {
       zooObjectStructure.properties.foreach(property => {

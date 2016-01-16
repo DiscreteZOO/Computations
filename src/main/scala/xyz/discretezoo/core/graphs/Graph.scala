@@ -1,7 +1,8 @@
 package xyz.discretezoo.core.graphs
 
 import java.sql.ResultSet
-import xyz.discretezoo.core.{ZooObject, ZooObjectStructure}
+import io.duality.PersistableSet
+import xyz.discretezoo.core.{PropertyValue, Property, ZooObject, ZooObjectStructure}
 import xyz.discretezoo.core.externalformats.{String6, InitFileParser}
 import xyz.discretezoo.snauty.Binding
 
@@ -11,6 +12,7 @@ import xyz.discretezoo.snauty.Binding
 
 class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood], val uniqueId: String) extends ZooObject {
 
+  val properties = new PersistableSet[PropertyValue[_]]
   val order = adjacencies.size
 
   def description = s"An undirected graph of order $order."
@@ -38,6 +40,11 @@ object Graph extends ZooObjectStructure[Graph] {
   val name = "Graph" // for JSON
   val tableSQLite = "graph"
   val properties = InitFileParser.getProperties(name)
+
+  def loadFromInit(): Unit = {
+    val initJSON = new InitFileParser("init.json").getJSON
+    println(initJSON.apply("Graph").apply("properties").apply(0).apply("list"))
+  }
 
   def constructFromSQLite(resultSet: ResultSet) = {
     println(resultSet.getInt("zooid"))

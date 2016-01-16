@@ -8,6 +8,12 @@ import xyz.discretezoo.core.{PropertyType, Property}
   * Created by katja on 02/01/16.
   */
 
+class InitFileParser(fileName: String) {
+
+  def getJSON = upickle.json.read(scala.io.Source.fromFile("init.json").mkString)
+
+}
+
 object InitFileParser {
 
   private val json = new JSONObject(scala.io.Source.fromFile("init.json").mkString)

@@ -19,6 +19,8 @@ object Main {
     db.connectRoot(this)
     graphs.updateFromSQLite
 
+//    Graph.loadFromInit()
+
     atomic {
 //      println(Graph.dynamicProperties)
       // transaction
