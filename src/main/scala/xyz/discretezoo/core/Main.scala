@@ -2,7 +2,8 @@ package xyz.discretezoo.core
 
 import io.duality.{PersistableSet, Database}
 import io.duality.TransactionManager.atomic
-import xyz.discretezoo.core.graphs.Graph
+import xyz.discretezoo.core.externalformats.String6
+import xyz.discretezoo.core.graphs.{ValidString6, Graph}
 
 /**
  * Created by katja on 20/08/15.
@@ -19,7 +20,7 @@ object Main {
     db.connectRoot(this)
     graphs.updateFromSQLite
 
-//    Graph.loadFromInit()
+    //    Graph.loadFromInit()
 
     atomic {
       // podatke samo enkrat vlece iz baze, sicer bi jih vsakic znova
