@@ -10,12 +10,13 @@ import xyz.discretezoo.snauty.Binding
  * Created by katja on 10/11/15.
  */
 
-class Graph(val adjacencies: Map[Long, LabelledVertexNeighbourhood], val uniqueId: String) extends ZooObject {
+class Graph(val string6: String6, val uniqueId: String) extends ZooObject {
 
   val properties = new PersistableSet[PropertyValue[_]]
   val order = adjacencies.size
 
   def description = s"An undirected graph of order $order."
+  def adjacencies = string6.parse
   def minDegree = adjacencies.mapValues(_.degree).values.min
   def maxDegree = adjacencies.mapValues(_.degree).values.max
 
@@ -48,7 +49,7 @@ object Graph extends ZooObjectStructure[Graph] {
 
   def constructFromSQLite(resultSet: ResultSet): Graph = {
     println(resultSet.getInt("zooid"))
-    new Graph(new String6(resultSet.getString("data")).parse, resultSet.getString("unique_id"))
+    new Graph(new String6(resultSet.getString("data")), resultSet.getString("unique_id"))
   }
 
 }

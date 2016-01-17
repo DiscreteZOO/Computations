@@ -1,9 +1,11 @@
 package xyz.discretezoo.core.graphs
 
+import xyz.discretezoo.core.externalformats.String6
+
 /**
   * Created by katja on 17/11/15.
   */
-class RegularGraph(adjacencies: Map[Long, LabelledVertexNeighbourhood], uniqueId: String) extends Graph(adjacencies, uniqueId) {
+class RegularGraph(string6: String6, uniqueId: String) extends Graph(string6, uniqueId) {
 
   require(minDegree == maxDegree, "The input is not a regular graph")
 
