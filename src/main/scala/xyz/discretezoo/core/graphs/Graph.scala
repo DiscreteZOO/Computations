@@ -14,11 +14,45 @@ class Graph(val string6: ValidString6, val uniqueId: String) extends ZooObject {
 
   val properties = new PersistableSet[PropertyValue[_]]
   val order = adjacencies.size
-
+  
   def description = s"An undirected graph of order $order."
   def adjacencies = new String6(string6.string).parse
   def minDegree = adjacencies.mapValues(_.degree).values.min
   def maxDegree = adjacencies.mapValues(_.degree).values.max
+
+  def getPropertyValueByName(propertyName: String): Option[PropertyValue[_]] = {
+    val subset = properties.filter(p => p.property.name == propertyName)
+    subset.headOption
+  }
+
+  def satisfiesCondition(property: Property[_], condition: String): Boolean = {
+    val operator = """^(=|==|<=|>=|<|>)(\d+\.?\d*)$""".r
+    val interval = """^([\[\(])(\d+\.?\d*),?(\d+\.?\d*)([\]\)])$""".r
+    properties.exists(p => p.property == property && {
+      val value = p.value.asInstanceOf[Int]
+      condition match {
+        case operator(op, n) => op match {
+          case "=" => value == n.toInt
+          case "==" => value == n.toInt
+          case "<=" => value <= n.toInt
+          case ">=" => value >= n.toInt
+          case "<" => value < n.toInt
+          case ">" => value > n.toInt
+        }
+        case interval(leftBrace, lowerBound, upperBound, rightBrace) => {
+          {leftBrace match {
+            case "(" => lowerBound.toInt < value
+            case "[" => lowerBound.toInt <= value
+          }} &&
+          {rightBrace match {
+            case ")" => value < upperBound.toInt
+            case "]" => value <= upperBound.toInt
+          }}
+        }
+        case _ => condition.split(",").map(s => s.toInt == value).exists(v => v == true)
+      }
+    })
+  }
 
   def neighbourSets: Map[Long, Set[Long]] = adjacencies.map(m => m._1 -> m._2.neighbours.map(_.label).toSet)
   def nautyCanonical: String = new Binding().callSparseNauty(neighbourSets)

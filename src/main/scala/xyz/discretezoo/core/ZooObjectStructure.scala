@@ -12,6 +12,7 @@ trait ZooObjectStructure[T <: ZooObject] {
   val tableSQLite: String
   val properties: PersistableSet[Property[_]]
 
+  def getPropertyByName(propertyName: String): Property[_] = properties.filter(p => p.name == propertyName).head
   def constructFromSQLite(resultSet: ResultSet): T
   def persistableSet = new PersistableSet[T]
 

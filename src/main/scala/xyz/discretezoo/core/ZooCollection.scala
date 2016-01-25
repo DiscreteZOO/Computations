@@ -2,6 +2,7 @@ package xyz.discretezoo.core
 
 import externalformats.SQLiteTable
 import io.duality.PersistableSet
+import io.duality.TransactionManager.atomic
 import xyz.discretezoo.core.graphs.{ValidString6, Graph}
 
 /**
@@ -16,11 +17,15 @@ class ZooCollection[T <: ZooObject](val zooObjectStructure: ZooObjectStructure[T
 
     val table = new SQLiteTable("graphzoo.db", zooObjectStructure)
 
-    table.next
-//    while (table.next) {
-    val obj = table.get()
-//    this.persistableSet += obj
-//    }
+    atomic {
+      var counter = 0
+      while (table.next && counter < 3000) {
+        val obj = table.get()
+        if (this.persistableSet.exists(o => o.uniqueId == obj.uniqueId)) println("found one")
+        else this.persistableSet += obj
+        counter += 1
+      }
+    }
 
     table.close
 //    check if graph exists in database via canonical labelling

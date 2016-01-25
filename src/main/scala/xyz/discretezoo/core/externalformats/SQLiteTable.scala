@@ -3,7 +3,7 @@ package xyz.discretezoo.core.externalformats
 import java.sql.{DriverManager, Statement}
 
 import io.duality.TransactionManager.atomic
-import xyz.discretezoo.core.{ZooObject, Property, PropertyValue, ZooObjectStructure}
+import xyz.discretezoo.core._
 
 /**
   * Created by katja on 08/01/16.
@@ -30,19 +30,19 @@ class SQLiteTable[T <: ZooObject](dbName: String, zooObjectStructure: ZooObjectS
         if (rowIterator.getObject(property.name) != null) property.propertyType.name match {
           case "Boolean" => {
             val result = rowIterator.getBoolean(property.name)
-            if (result != null) obj.properties += new PropertyValue[Boolean](property.asInstanceOf[Property[Boolean]], result)
+            if (result != null) obj.properties += new BooleanPropertyValue(property.asInstanceOf[Property[Boolean]], result)
           }
           case "Double" => {
             val result = rowIterator.getDouble(property.name)
-            if (result != null) obj.properties += new PropertyValue[Double](property.asInstanceOf[Property[Double]], result)
+            if (result != null) obj.properties += new DoublePropertyValue(property.asInstanceOf[Property[Double]], result)
           }
           case "Integer" => {
             val result = rowIterator.getInt(property.name)
-            if (result != null) obj.properties += new PropertyValue[Int](property.asInstanceOf[Property[Int]], result)
+            if (result != null) obj.properties += new IntPropertyValue(property.asInstanceOf[Property[Int]], result)
           }
           case "String" => {
             val result = rowIterator.getString(property.name)
-            if (result != null) obj.properties += new PropertyValue[String](property.asInstanceOf[Property[String]], result)
+            if (result != null) obj.properties += new StringPropertyValue(property.asInstanceOf[Property[String]], result)
           }
           case "Rational" => {}
         }
