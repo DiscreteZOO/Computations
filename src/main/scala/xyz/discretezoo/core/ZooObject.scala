@@ -8,7 +8,6 @@ import _root_.io.duality.PersistableSet
 trait ZooObject {
 
   val uniqueId: String
-  val properties: PersistableSet[PropertyValue[_]]
 
   def description: String
   override def toString: String

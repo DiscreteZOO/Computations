@@ -16,41 +16,10 @@ class SQLiteTable[T <: ZooObject](dbName: String, zooObjectStructure: ZooObjectS
   statement.setQueryTimeout(30)
 
   private val results = statement.executeQuery(s"PRAGMA table_info('${zooObjectStructure.tableSQLite}');") // cid, name, type, notnull, dflt_value, pk
-
-  private val rowIterator = statement.executeQuery(s"SELECT * FROM ${zooObjectStructure.tableSQLite} JOIN object ON ${zooObjectStructure.tableSQLite}.zooid = object.zooid;")
+  private val rowIterator = statement.executeQuery(s"SELECT * FROM ${zooObjectStructure.tableSQLite} JOIN object ON ${zooObjectStructure.tableSQLite}.zooid = object.zooid JOIN graph_cvt ON ${zooObjectStructure.tableSQLite}.zooid = graph_cvt.zooid;")
 
   def next = rowIterator.next()
-
-  def get(): T = {
-
-    val obj = zooObjectStructure.constructFromSQLite(rowIterator)
-
-    atomic {
-      zooObjectStructure.properties.foreach(property => {
-        if (rowIterator.getObject(property.name) != null) property.propertyType.name match {
-          case "Boolean" => {
-            val result = rowIterator.getBoolean(property.name)
-            if (result != null) obj.properties += new BooleanPropertyValue(property.asInstanceOf[Property[Boolean]], result)
-          }
-          case "Double" => {
-            val result = rowIterator.getDouble(property.name)
-            if (result != null) obj.properties += new DoublePropertyValue(property.asInstanceOf[Property[Double]], result)
-          }
-          case "Integer" => {
-            val result = rowIterator.getInt(property.name)
-            if (result != null) obj.properties += new IntPropertyValue(property.asInstanceOf[Property[Int]], result)
-          }
-          case "String" => {
-            val result = rowIterator.getString(property.name)
-            if (result != null) obj.properties += new StringPropertyValue(property.asInstanceOf[Property[String]], result)
-          }
-          case "Rational" => {}
-        }
-      })
-
-    }
-    obj
-  }
+  def get(): T = zooObjectStructure.constructFromSQLite(rowIterator)
 
   def close = {
     statement.close()

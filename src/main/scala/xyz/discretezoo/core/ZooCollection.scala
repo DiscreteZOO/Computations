@@ -28,9 +28,8 @@ class ZooCollection[T <: ZooObject](val zooObjectStructure: ZooObjectStructure[T
     }
 
     table.close
-//    check if graph exists in database via canonical labelling
-//    if not, insert
-//    else compare properties, update if necessary
+
+//    compare properties, update if necessary
 
   }
 
