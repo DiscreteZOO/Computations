@@ -5,11 +5,11 @@ import java.sql.{ResultSet, Statement, DriverManager}
 /**
   * Created by katja on 25/01/16.
   */
-class PostgresTable {
+class PostgresTable(jdbcConnectionString: String) {
 
   def filter(propertiesString: String): String = {
 
-    val pgsql = DriverManager.getConnection("jdbc:pgsql://localhost:5432/graphzoo?user=graphzoo&password=gr4ph!Z00")
+    val pgsql = DriverManager.getConnection(jdbcConnectionString)
     val query: Statement = pgsql.createStatement()
 
     val rowIterator = query.executeQuery(s"SELECT * FROM ${quotedIdentifier("xyz.discretezoo.core.graphs.Graph")}${constructWhereClause(propertiesString)};")
@@ -25,6 +25,22 @@ class PostgresTable {
 
   }
 
+  def count(propertiesString: String): String = {
+
+    val pgsql = DriverManager.getConnection(jdbcConnectionString)
+    val query: Statement = pgsql.createStatement()
+
+    val rowIterator = query.executeQuery(s"SELECT COUNT(*) FROM ${quotedIdentifier("xyz.discretezoo.core.graphs.Graph")}${constructWhereClause(propertiesString)};")
+    rowIterator.next()
+    val result = rowIterator.getInt(1)
+
+    query.close()
+    pgsql.close()
+
+    s"${result}"
+
+  }
+
   private def rowToJSON(resultSet: ResultSet): String = {
     val booleans = Seq("isBipartite", "isCayley", "isMoebiusLadder", "isPrism", "isSpx")
     val integers = Seq("order", "diameter", "girth", "oddGirth")
@@ -34,24 +50,24 @@ class PostgresTable {
   }
 
   private def constructWhereClause(propertiesString: String): String = {
-    val conditions = propertiesString.split("&").map(property => {
+    val conditions = propertiesString.split(";").map(property => {
       if (isBoolean(property)) s"(${booleanCondition(property)})"
       else s"(${numericCondition(property)})"
     })
-    if (conditions.nonEmpty) s" WHERE ${conditions.drop(1).foldLeft(conditions.head)((a, b) => operatorJoin("AND", a, b))}"
+    if (propertiesString.nonEmpty) s" WHERE ${conditions.drop(1).foldLeft(conditions.head)((a, b) => operatorJoin("AND", a, b))}"
     else ""
   }
 
   private def isBoolean(propertyString: String): Boolean = propertyString.contains("!") || !propertyString.contains(":")
 
   private def booleanCondition(propertyString: String): String = {
-    if (propertyString.contains("!")) s"${quotedIdentifier(propertyString.drop(1))} IS FALSE"
-    else s"${quotedIdentifier(propertyString)} IS TRUE"
+    if (propertyString.contains("!")) s"${quotedIdentifier(underscoreToCamel(propertyString.drop(1)))} IS FALSE"
+    else s"${quotedIdentifier(underscoreToCamel(propertyString))} IS TRUE"
   }
 
   private def numericCondition(propertyString: String): String = {
     val name = quotedIdentifier(underscoreToCamel(propertyString.split(":").head))
-    val condition = propertyString.split(":").last
+    val condition = propertyString.split(":").last.replace("*", "=")
     val operator = """^(=|==|<=|>=|<|>)(\d+\.?\d*)$""".r
     val interval = """^([\[\(])(\d+\.?\d*),?(\d+\.?\d*)([\]\)])$""".r
     condition match {

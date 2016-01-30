@@ -15,19 +15,23 @@ class ZooCollection[T <: ZooObject](val zooObjectStructure: ZooObjectStructure[T
 
   def updateFromSQLite(): Unit = {
 
-    val table = new SQLiteTable("graphzoo.db", zooObjectStructure)
+    val table = new SQLiteTable("discretezoo.db", zooObjectStructure)
 
-    atomic {
-      var counter = 0
-      while (table.next && counter < 3000) {
-        val obj = table.get()
-        if (this.persistableSet.exists(o => o.uniqueId == obj.uniqueId)) println("found one")
-        else this.persistableSet += obj
-        counter += 1
+    Range(0,111360).grouped(500).foreach(range => {
+      println("next 500")
+      atomic {
+        range.foreach(range => {
+          if (table.next) {
+            val obj = table.get()
+            if (!this.persistableSet.exists(o => o.uniqueId == obj.uniqueId)) this.persistableSet += obj
+          }
+        })
       }
-    }
+    })
 
     table.close
+
+    println("done")
 
 //    compare properties, update if necessary
 

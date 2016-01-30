@@ -1,5 +1,6 @@
 package xyz.discretezoo.core
 
+import java.net.URLDecoder
 import java.sql.{ResultSet, Statement, DriverManager}
 
 import akka.actor.ActorSystem
@@ -18,11 +19,13 @@ import xyz.discretezoo.core.graphs.Graph
 
 object Main {
 
-  val graphs = new ZooCollection(Graph)
+//  val graphs = new ZooCollection(Graph)
 
   def main (args: Array[String]) {
 
-    val db = new Database("jdbc:pgsql://localhost:5432/graphzoo?user=graphzoo&password=gr4ph!Z00")
+    val jdbcConnectionString = "jdbc:pgsql://localhost:5432/discretezoo?user=discretezoo&password=D!screteZ00"
+
+    val db = new Database(jdbcConnectionString)
 
     db.connectRoot(this)
 //    graphs.updateFromSQLite
@@ -33,10 +36,16 @@ object Main {
     val route = get {
       (path("graphs") & get) {
         parameter("par") {
-          val pgsql = new PostgresTable
-          par => complete(pgsql.filter("girth:=4&!isBipartite"))
+          val pgsql = new PostgresTable(jdbcConnectionString)
+          par => complete(pgsql.filter(par))
         }
-      }
+      } ~
+        (path("count") & get) {
+          parameter("par") {
+            val pgsql = new PostgresTable(jdbcConnectionString)
+            par => complete(pgsql.count(par))
+          }
+        }
     }
 
     Http().bindAndHandle(RouteResult.route2HandlerFlow(route), "localhost", 8080)

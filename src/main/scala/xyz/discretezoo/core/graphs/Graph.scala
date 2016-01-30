@@ -13,14 +13,24 @@ import xyz.discretezoo.snauty.Binding
 class Graph(val string6: ValidString6, val uniqueId: String, booleanProperties: Seq[Boolean], intProperties: Seq[Int]) extends ZooObject {
 
   val order = adjacencies.size
-  val isBipartite = booleanProperties(0)
-  val isCayley = booleanProperties(1)
-  val isMoebiusLadder = booleanProperties(2)
-  val isPrism = booleanProperties(3)
-  val isSpx = booleanProperties(4)
-  val diameter = intProperties(0)
-  val girth = intProperties(1)
-  val oddGirth = intProperties(2)
+
+  val isArcTransitive = booleanProperties(0)
+  val isBipartite = booleanProperties(1)
+  val isCayley = booleanProperties(2)
+  val isDistanceRegular = booleanProperties(3)
+  val isDistanceTransitive = booleanProperties(4)
+  val isEdgeTransitive = booleanProperties(5)
+  val isEulerian = booleanProperties(6)
+  val isMoebiusLadder = booleanProperties(7)
+  val isPrism = booleanProperties(8)
+  val isSplit = booleanProperties(9)
+  val isStronglyRegular = booleanProperties(10)
+  val isSpx = booleanProperties(11)
+  val cliqueNumber = intProperties(0)
+  val diameter = intProperties(1)
+  val girth = intProperties(2)
+  val oddGirth = intProperties(3)
+  val trianglesCount = intProperties(4)
 
   def description = s"An undirected graph of order $order."
   def adjacencies = new String6(string6.string).parse
@@ -29,10 +39,17 @@ class Graph(val string6: ValidString6, val uniqueId: String, booleanProperties: 
 
   def hasProperty(propertyName: String, condition: Boolean): Boolean = {
     propertyName match {
+      case "is_arc_transitive" => isArcTransitive == condition
       case "is_bipartite" => isBipartite == condition
       case "is_cayley" => isCayley == condition
+      case "is_distance_regular" => isDistanceRegular == condition
+      case "is_distance_transitive" => isDistanceTransitive == condition
+      case "is_edge_transitive" => isEdgeTransitive == condition
+      case "is_eulerian" => isEulerian == condition
       case "is_moebius_ladder" => isMoebiusLadder == condition
       case "is_prism" => isPrism == condition
+      case "is_split" => isSplit == condition
+      case "is_strongly_regular" => isStronglyRegular == condition
       case "is_spx" => isSpx == condition
     }
   }
@@ -42,9 +59,11 @@ class Graph(val string6: ValidString6, val uniqueId: String, booleanProperties: 
     val interval = """^([\[\(])(\d+\.?\d*),?(\d+\.?\d*)([\]\)])$""".r
     val value = propertyName match {
       case "order" => order
+      case "clique_number" => cliqueNumber
       case "diameter" => diameter
       case "girth" => girth
       case "odd_girth" => oddGirth
+      case "triangles_count" => trianglesCount
     }
     condition match {
       case operator(op, n) => op match {
@@ -98,8 +117,9 @@ object Graph extends ZooObjectStructure[Graph] {
 
   def constructFromSQLite(resultSet: ResultSet): Graph = {
     println(resultSet.getInt("zooid"))
-    val booleans = Seq("is_bipartite", "is_cayley", "is_moebius_ladder", "is_prism", "is_spx").map(resultSet.getBoolean(_))
-    val ints = Seq("diameter", "girth", "odd_girth").map(resultSet.getInt(_))
+
+    val booleans = Seq("is_arc_transitive", "is_bipartite", "is_cayley", "is_distance_regular", "is_distance_transitive", "is_edge_transitive", "is_eulerian", "is_moebius_ladder", "is_prism", "is_split", "is_strongly_regular", "is_spx").map(resultSet.getBoolean(_))
+    val ints = Seq("clique_number", "diameter", "girth", "odd_girth", "triangles_count").map(resultSet.getInt(_))
     new Graph(new ValidString6(resultSet.getString("data")), resultSet.getString("unique_id"), booleans, ints)
   }
 
