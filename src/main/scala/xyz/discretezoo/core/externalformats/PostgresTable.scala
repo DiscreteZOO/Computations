@@ -7,12 +7,36 @@ import java.sql.{ResultSet, Statement, DriverManager}
   */
 class PostgresTable(jdbcConnectionString: String) {
 
+  def countPerOrder(): String = {
+
+    val pgsql = DriverManager.getConnection(jdbcConnectionString)
+    val query: Statement = pgsql.createStatement()
+
+    val tableName = quotedIdentifier("xyz.discretezoo.core.graphs.Graph")
+
+    val rowIterator = query.executeQuery(s"SELECT $tableName.order as order, COUNT(*) as number FROM $tableName GROUP BY $tableName.order ORDER BY $tableName.order ASC;")
+
+    val result = StringBuilder.newBuilder
+
+    while (rowIterator.next()) result.append(s"${rowIterator.getInt(1)}\t${rowIterator.getInt(2)}\n")
+
+    query.close()
+    pgsql.close()
+
+    s"[${result.toString.drop(1)}]"
+
+  }
+
   def filter(propertiesString: String): String = {
 
     val pgsql = DriverManager.getConnection(jdbcConnectionString)
     val query: Statement = pgsql.createStatement()
 
-    val rowIterator = query.executeQuery(s"SELECT * FROM ${quotedIdentifier("xyz.discretezoo.core.graphs.Graph")}${constructWhereClause(propertiesString)};")
+    val tableCollection = quotedIdentifier("io.duality.PersistableSet@data")
+    val tableName = quotedIdentifier("xyz.discretezoo.core.graphs.Graph")
+    val tableCatalog = quotedIdentifier("xyz.discretezoo.core.CatalogId")
+
+    val rowIterator = query.executeQuery(s"SELECT * FROM $tableName JOIN $tableCollection ON $tableName.catalogues = $tableCollection.${quotedIdentifier("@collection")} JOIN $tableCatalog ON $tableCollection.${quotedIdentifier("@element")} = $tableCatalog.${quotedIdentifier("@id")} ${constructWhereClause(propertiesString)};")
 
     val result = StringBuilder.newBuilder
 
@@ -22,6 +46,34 @@ class PostgresTable(jdbcConnectionString: String) {
     pgsql.close()
 
     s"[${result.toString.drop(1)}]"
+
+  }
+
+  def download(propertiesString: String, mode: String): String = {
+
+    val pgsql = DriverManager.getConnection(jdbcConnectionString)
+    val query: Statement = pgsql.createStatement()
+
+    val tableName = quotedIdentifier("xyz.discretezoo.core.graphs.Graph")
+    val tableString6 = quotedIdentifier("xyz.discretezoo.core.graphs.ValidString6")
+
+    val result = StringBuilder.newBuilder
+
+    if (mode == "package") {
+      result.append("import discretezoo.entities.cvt\nset = [discretezoo.entities.cvt.CVTGraph(x) for x in [\n")
+      val rowIterator = query.executeQuery(s"SELECT ${quotedIdentifier("uniqueId")} FROM $tableName${constructWhereClause(propertiesString)};")
+      while (rowIterator.next()) result.append(s"\t'${rowIterator.getString("uniqueId")}',\n")
+      result.dropRight(1).append("]]\n")
+    }
+    else {
+      val rowIterator = query.executeQuery(s"SELECT string FROM $tableName JOIN $tableString6 ON $tableName.string6 = $tableString6.${quotedIdentifier("@id")}${constructWhereClause(propertiesString)};")
+      while (rowIterator.next()) result.append(s"${rowIterator.getString("string")}\n")
+    }
+
+    query.close()
+    pgsql.close()
+
+    result.toString
 
   }
 
@@ -42,9 +94,9 @@ class PostgresTable(jdbcConnectionString: String) {
   }
 
   private def rowToJSON(resultSet: ResultSet): String = {
-    val booleans = Seq("isBipartite", "isCayley", "isMoebiusLadder", "isPrism", "isSpx")
-    val integers = Seq("order", "diameter", "girth", "oddGirth")
-    val intermediate = booleans.map(property => s"${quotedIdentifier(camelToUnderscores(property))}: ${resultSet.getBoolean(property).toString}").foldLeft(s"${quotedIdentifier("id")}: ${quotedIdentifier(resultSet.getString("uniqueId"))}")(commaJoin)
+    val booleans = Seq("isArcTransitive", "isBipartite", "isCayley", "isDistanceRegular", "isDistanceTransitive", "isEdgeTransitive", "isMoebiusLadder", "isPartialCube", "isPrism", "isSplit", "isStronglyRegular", "isSpx")
+    val integers = Seq("cliqueNumber", "diameter", "girth", "oddGirth", "order", "trianglesCount")
+    val intermediate = booleans.map(property => s"${quotedIdentifier(camelToUnderscores(property))}: ${resultSet.getBoolean(property).toString}").foldLeft(s"${quotedIdentifier("id")}: ${quotedIdentifier(resultSet.getString("uniqueId"))}, ${quotedIdentifier("cvt")}: ${quotedIdentifier(resultSet.getString("index"))} ")(commaJoin)
     val jsonString = integers.map(property => s"${quotedIdentifier(camelToUnderscores(property))}: ${resultSet.getInt(property).toString}").foldLeft(intermediate)(commaJoin)
     s"{ $jsonString }"
   }

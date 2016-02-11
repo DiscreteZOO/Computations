@@ -8,6 +8,8 @@ import _root_.io.duality.PersistableSet
 trait ZooObject {
 
   val uniqueId: String
+  val catalogues: PersistableSet[CatalogId]
+  val aliases: PersistableSet[String]
 
   def description: String
   override def toString: String

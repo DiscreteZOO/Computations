@@ -17,13 +17,13 @@ class ZooCollection[T <: ZooObject](val zooObjectStructure: ZooObjectStructure[T
 
     val table = new SQLiteTable("discretezoo.db", zooObjectStructure)
 
-    Range(0,111360).grouped(500).foreach(range => {
+    Range(0,212269).grouped(500).foreach(range => {
       println("next 500")
       atomic {
         range.foreach(range => {
           if (table.next) {
             val obj = table.get()
-            if (!this.persistableSet.exists(o => o.uniqueId == obj.uniqueId)) this.persistableSet += obj
+            this.persistableSet += obj
           }
         })
       }
