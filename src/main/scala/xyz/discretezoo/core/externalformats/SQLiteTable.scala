@@ -1,8 +1,6 @@
 package xyz.discretezoo.core.externalformats
 
 import java.sql.{DriverManager, Statement}
-
-import io.duality.TransactionManager.atomic
 import xyz.discretezoo.core._
 
 /**

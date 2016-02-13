@@ -15,52 +15,42 @@ import xyz.discretezoo.core.graphs.Graph
 
 object Main {
 
-  val graphs = new ZooCollection(Graph)
-
   def main (args: Array[String]) {
 
     val jdbcConnectionString = "jdbc:pgsql://localhost:5432/discretezoo?user=discretezoo&password=D!screteZ00"
     val db = new Database(jdbcConnectionString)
 
-    db.connectRoot(this)
+    implicit val system = ActorSystem(name = "System")
+    implicit val materializer = ActorMaterializer()
 
-    graphs.updateFromSQLite()
+    val route = get {
+      (path("graphs") & get) {
+        parameter("par") {
+          val pgsql = new PostgresTable(jdbcConnectionString)
+          par => complete(pgsql.filter(par))
+        }
+      } ~
+        (path("count") & get) {
+          parameter("par") {
+            val pgsql = new PostgresTable(jdbcConnectionString)
+            par => complete(pgsql.count(par))
+          }
+        } ~
+        (path("download") & get) {
+          parameter("par") {
+            val pgsql = new PostgresTable(jdbcConnectionString)
+            par => complete(pgsql.download(par, "string6"))
+          }
+        } ~
+        (path("downloadPackage") & get) {
+          parameter("par") {
+            val pgsql = new PostgresTable(jdbcConnectionString)
+            par => complete(pgsql.download(par, "package"))
+          }
+        }
+    }
 
-//    val table = new PostgresTable(jdbcConnectionString)
-//    val csv = table.countPerOrder()
-//    println(csv)
-
-//    implicit val system = ActorSystem(name = "System")
-//    implicit val materializer = ActorMaterializer()
-//
-//    val route = get {
-//      (path("graphs") & get) {
-//        parameter("par") {
-//          val pgsql = new PostgresTable(jdbcConnectionString)
-//          par => complete(pgsql.filter(par))
-//        }
-//      } ~
-//        (path("count") & get) {
-//          parameter("par") {
-//            val pgsql = new PostgresTable(jdbcConnectionString)
-//            par => complete(pgsql.count(par))
-//          }
-//        } ~
-//        (path("download") & get) {
-//          parameter("par") {
-//            val pgsql = new PostgresTable(jdbcConnectionString)
-//            par => complete(pgsql.download(par, "string6"))
-//          }
-//        } ~
-//        (path("downloadPackage") & get) {
-//          parameter("par") {
-//            val pgsql = new PostgresTable(jdbcConnectionString)
-//            par => complete(pgsql.download(par, "package"))
-//          }
-//        }
-//    }
-//
-//    Http().bindAndHandle(RouteResult.route2HandlerFlow(route), "localhost", 8080)
+    Http().bindAndHandle(RouteResult.route2HandlerFlow(route), "localhost", 8080)
 
   }
 
