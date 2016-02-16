@@ -17,6 +17,11 @@ class SQLiteTable[T <: ZooObject](dbName: String, zooObjectStructure: ZooObjectS
   private val results = statement.executeQuery(s"PRAGMA table_info('$table');") // cid, name, type, notnull, dflt_value, pk
   private val rowIterator = statement.executeQuery(s"SELECT * FROM $table ${join("cvt")} ${join("vt")} ${join("spx")} JOIN object_unique_id ON $table.zooid = object_unique_id.object_id WHERE object_unique_id.algorithm = 'sage';")
 
+  def updateOrders(): Unit = {
+    val vtIterator =  statement.executeQuery(s"SELECT * FROM object_unique_id JOIN graph ON graph.zooid = object_id WHERE algorithm = 'sage' AND graph.'name' IS NOT NULL;")
+    while (vtIterator.next()) println(s"UPDATE *xyz.discretezoo.core.graphs.Graph* SET *name* = '${vtIterator.getString("name")}' WHERE *uniqueId* = '${vtIterator.getString("unique_id")}';")
+  }
+
   def next = rowIterator.next()
   def get(): T = {
     var connectedness = rowIterator.getInt("average_degree")

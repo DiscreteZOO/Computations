@@ -50,20 +50,26 @@ class PostgresTable(jdbcConnectionString: String) {
     val result = StringBuilder.newBuilder
 
     if (mode == "package") {
-      result.append("import discretezoo.entities.cvt\nset = [discretezoo.entities.cvt.CVTGraph(x) for x in [\n")
-      val rowIterator = query.executeQuery(s"SELECT ${quotedIdentifier("uniqueId")} FROM $tableName${constructWhereClause(propertiesString)};")
-      while (rowIterator.next()) result.append(s"\t'${rowIterator.getString("uniqueId")}',\n")
-      result.dropRight(1).append("]]\n")
+      val rowIterator = query.executeQuery(s"SELECT ${quotedIdentifier("uniqueId")} as uid FROM $tableName${constructWhereClause(propertiesString)};")
+      while (rowIterator.next()) result.append(s"'${rowIterator.getString("uid")}', ")
+    }
+    else if (mode == "string6sage") {
+      val str6table = quotedIdentifier("xyz.discretezoo.core.graphs.ValidString6")
+      val rowIterator = query.executeQuery(s"SELECT $str6table.string as s6 FROM $tableName JOIN $str6table ON $tableName.string6 = $str6table.${quotedIdentifier("@id")}${constructWhereClause(propertiesString)};")
+      while (rowIterator.next()) result.append(s"'${rowIterator.getString("s6")}', ")
     }
     else {
-      val rowIterator = query.executeQuery(s"SELECT string FROM $tableName JOIN $tableString6 ON $tableName.string6 = $tableString6.${quotedIdentifier("@id")}${constructWhereClause(propertiesString)};")
-      while (rowIterator.next()) result.append(s"${rowIterator.getString("string")}\n")
+      val str6table = quotedIdentifier("xyz.discretezoo.core.graphs.ValidString6")
+      val rowIterator = query.executeQuery(s"SELECT $str6table.string as s6 FROM $tableName JOIN $str6table ON $tableName.string6 = $str6table.${quotedIdentifier("@id")}${constructWhereClause(propertiesString)};")
+      while (rowIterator.next()) result.append(s"${rowIterator.getString("s6")}\n")
     }
 
     query.close()
     pgsql.close()
 
-    result.toString
+    if (mode == "package") s"import discretezoo.entities.cvt\ndownloaded_graphs = [discretezoo.entities.cvt.CVTGraph(x) for x in [${result.toString().dropRight(2)}]]"
+    else if (mode == "string6sage") s"downloaded_graphs = [Graph(s6) for s6 in [${result.toString().dropRight(2)}]]"
+    else s"${result.toString()}"
 
   }
 
@@ -85,10 +91,10 @@ class PostgresTable(jdbcConnectionString: String) {
 
   private def rowToJSON(resultSet: ResultSet): String = {
     val booleans = Seq("isArcTransitive", "isBipartite", "isCayley", "isDistanceRegular", "isDistanceTransitive", "isEdgeTransitive", "isMoebiusLadder", "isPartialCube", "isPrism", "isSplit", "isStronglyRegular", "isSpx")
-    val integers = Seq("cliqueNumber", "diameter", "girth", "oddGirth", "order", "trianglesCount", "symcubicIndex", "cvtIndex", "vtIndex")
+    val integers = Seq("cliqueNumber", "degree", "diameter", "girth", "oddGirth", "order", "trianglesCount", "symcubicIndex", "cvtIndex", "vtIndex")
     val intermediate = booleans.map(property => {
       s"${quotedIdentifier(camelToUnderscores(property))}: ${resultSet.getBoolean(property).toString}"
-    }).foldLeft(s"${quotedIdentifier("id")}: ${quotedIdentifier(resultSet.getString("uniqueId"))}")(commaJoin)
+    }).foldLeft(s"${quotedIdentifier("id")}: ${quotedIdentifier(resultSet.getString("uniqueId"))}, ${quotedIdentifier("name")}: ${quotedIdentifier(resultSet.getString("name"))}")(commaJoin)
     val jsonString = integers.map(property => s"${quotedIdentifier(camelToUnderscores(property))}: ${resultSet.getInt(property).toString}").foldLeft(intermediate)(commaJoin)
     s"{ $jsonString }"
   }
@@ -125,7 +131,7 @@ class PostgresTable(jdbcConnectionString: String) {
 
   private def booleanCondition(propertyString: String): String = {
     val name = if (propertyString.contains("!")) quotedIdentifier(underscoreToCamel(propertyString.drop(1))) else quotedIdentifier(underscoreToCamel(propertyString))
-    else s"$name IS NOT NULL AND $name IS ${if (propertyString.contains("!")) "FALSE" else "TRUE"}"
+    s"$name IS NOT NULL AND $name IS ${if (propertyString.contains("!")) "FALSE" else "TRUE"}"
   }
 
   private def numericCondition(propertyString: String): String = {

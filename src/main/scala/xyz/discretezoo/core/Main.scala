@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult
 import akka.stream.ActorMaterializer
 import io.duality.Database
-import xyz.discretezoo.core.externalformats.PostgresTable
+import xyz.discretezoo.core.externalformats.{SQLiteTable, PostgresTable}
 import xyz.discretezoo.core.graphs.Graph
 
 /**
@@ -39,18 +39,33 @@ object Main {
         (path("download") & get) {
           parameter("par") {
             val pgsql = new PostgresTable(jdbcConnectionString)
-            par => complete(pgsql.download(par, "string6"))
+            par => {
+              if (pgsql.count(par).toInt > 100) complete("For now it is only possible to download 100 graphs.")
+              else complete(pgsql.download(par, "string6"))
+            }
           }
         } ~
         (path("downloadPackage") & get) {
           parameter("par") {
             val pgsql = new PostgresTable(jdbcConnectionString)
-            par => complete(pgsql.download(par, "package"))
+            par => {
+              if (pgsql.count(par).toInt > 100) complete("For now it is only possible to download 100 graphs.")
+              else complete(pgsql.download(par, "package"))
+            }
+          }
+        } ~
+        (path("downloadSage") & get) {
+          parameter("par") {
+            val pgsql = new PostgresTable(jdbcConnectionString)
+            par => {
+              if (pgsql.count(par).toInt > 100) complete("For now it is only possible to download 100 graphs.")
+              else complete(pgsql.download(par, "string6sage"))
+            }
           }
         }
     }
 
-    Http().bindAndHandle(RouteResult.route2HandlerFlow(route), "localhost", 8080)
+    Http().bindAndHandle(RouteResult.route2HandlerFlow(route), "localhost", 8888)
 
   }
 
