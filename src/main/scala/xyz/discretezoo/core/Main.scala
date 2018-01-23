@@ -1,67 +1,33 @@
 package xyz.discretezoo.core
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.RouteResult
-import akka.stream.ActorMaterializer
-import io.duality.Database
-import io.duality.TransactionManager.atomic
-import xyz.discretezoo.core.graphs.Graph
+import externalprocess.{Gap, Lowx}
+import xyz.discretezoo.core.polytopes.P2orbit
 
-/**
- * Created by katja on 20/08/15.
- */
 
 object Main {
 
-  val graphs = new ZooCollection(Graph)
+  def main(args: Array[String]): Unit = {
 
-  def main (args: Array[String]) {
+//    val gapProcess = new Gap
+//    println(result)
+//    println(gapProcess.eval("1+1;"))
+//    println(gapProcess.eval("2+2;"))
+//    gapProcess.close()
 
-    val db = new Database("jdbc:pgsql://localhost:5432/graphzoo?user=graphzoo&password=gr4ph!Z00")
+    val P = new P2orbit(3, Set(1))
+//    println(P.LOWX.code)
+    val lowxOut = P.LOWX.get(40).last
+    println(P.GAP.code)
+    println(s"index: ${lowxOut._1}")
+    println(P.GAP.quotientCode(lowxOut._2.toSet))
 
-    db.connectRoot(this)
-//    graphs.updateFromSQLite
-
-    def filteredGraphs(parameters: String): String = {
-      val properties = parameters.split(",")
-      println(parameters)
-      atomic {
-        val s = graphs.persistableSet.filter(graph => properties.forall(property => {
-          if (property.contains("!")) {
-            val pv = graph.getPropertyValueByName(property.drop(1))
-            if (pv.isEmpty) false
-            else pv.get.value == false
-          }
-          else if (property.contains(":")) {
-            println("found numeric condition")
-            graph.satisfiesCondition(Graph.getPropertyByName(property.split(":").head), property.split(":").drop(1).head)
-          }
-          else {
-            val pv = graph.getPropertyValueByName(property)
-            if (pv.isEmpty) false
-            else pv.get.value == true
-          }
-        }))
-        println(s.size)
-      }
-      "testing"
-    }
-
-    implicit val system = ActorSystem(name = "System")
-    implicit val materializer = ActorMaterializer()
-
-    val route = get {
-      (path("graphs") & get) {
-        parameter("par") {
-          par => complete("yo") //filteredGraphs(par)
-        }
-      }
-    }
-
-    Http().bindAndHandle(RouteResult.route2HandlerFlow(route), "localhost", 8080)
-
+//    Range(0, 3).toSet.subsets().filter(s => s.nonEmpty && s.size < 3).foreach(s => {
+//      println("\n - - - - - ")
+//      println(s)
+//      val P2 = new P2orbit(3, s)
+//      println(P2.GAP.get)
+//      P2.GAP.getIntersectionConditions.foreach(println)
+//    })
   }
 
 }

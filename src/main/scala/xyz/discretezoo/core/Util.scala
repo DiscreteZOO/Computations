@@ -1,35 +1,20 @@
 package xyz.discretezoo.core
 
-import xyz.discretezoo.core.graphs.{AdjacencyListBuilder, LabelledVertexNeighbourhood}
-import scala.util.matching.Regex
+import scala.annotation.tailrec
 
-/**
-  * Created by katja on 17/11/15.
-  */
 object Util {
 
-  def commaJoin(a: Any, b: Any): String = s"$a, $b"
-
-  // TODO requirements on input
-  def buildAdjacencyList(adjacencies: Any): Map[Long, LabelledVertexNeighbourhood] = {
-
-    val adjacencyListBuilder = new AdjacencyListBuilder()
-
-    adjacencies match {
-      case edgeListString: String => {
-        val edgePattern = new Regex("""(\d+)[\ ,]+(\d+)""", "v1", "v2")
-        edgePattern.findAllIn(edgeListString).matchData.foreach(edge => {
-          adjacencyListBuilder.addEdge(edge.group("v1").toInt, edge.group("v2").toInt)
-        })
-      }
-//      case edgeListInt:
-      case indexMap: Map[Long, Set[Long]] => {
-        indexMap.foreach(pair => pair._2.foreach(vertex => adjacencyListBuilder.addEdge(pair._1, vertex)))
-      }
+  @tailrec
+  def sliceConsecutive[T](seq: Seq[T], accumulated: Seq[Seq[T]] = Seq()): Seq[Seq[T]] = {
+    seq match {
+      case Nil => accumulated
+      case first :: rest =>
+        val (head, tail) = seq.span(_ == first)
+        sliceConsecutive(tail, accumulated :+ head)
     }
-
-    adjacencyListBuilder.getMap
-
   }
 
+  def countConsecutive[T](seq: Seq[T]): Seq[Tuple2[T, Int]] = {
+    sliceConsecutive(seq).map(segment => Tuple2(segment.head, segment.length))
+  }
 }
