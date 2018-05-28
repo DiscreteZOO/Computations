@@ -1,8 +1,8 @@
-package xyz.discretezoo.core.polytopes
+package xyz.discretezoo.core.maniplexes
 
-import xyz.discretezoo.core.polytopes.groupRepresentation._
+import xyz.discretezoo.core.groupRepresentation._
 
-class P2orbit(rank: Int, I: Set[Int]) extends AutomorphismGroup {
+class M2orbit(rank: Int, I: Set[Int]) extends AutomorphismGroup {
 
   override val N: Set[Int] = Range(0, rank).toSet
   private val J: Set[Int] = N.diff(I)
@@ -37,6 +37,8 @@ class P2orbit(rank: Int, I: Set[Int]) extends AutomorphismGroup {
   * */
 
   override protected def getGenerators: Seq[Generator] = Seq(rho, alpha2, alpha3).flatMap(_.toSeq)
+
+  def generatorsAllowedToMapToID: Seq[Int] = getGenerators.filter(_.subscript.lengthCompare(2) == 0).map(generatorMap(_))
 
   override val generatorNames: Map[Generator, String] = getGenerators.map(g => (g, g.subscript match {
     case Seq(i) => "r_" + i.toString

@@ -1,10 +1,21 @@
 package xyz.discretezoo.core.externalprocess
 
-abstract class InteractiveProcess(command: String) {
+import scala.sys.process._
+
+sealed trait ZOOProcess
+
+abstract class BatchProcess(command: String) extends ZOOProcess {
+
+  protected var parameters: Option[String] = None
+
+  def run(): String = Seq(command, parameters.getOrElse("")).mkString(" ").!!
+
+}
+
+abstract class InteractiveProcess(command: String) extends ZOOProcess {
 
   import scala.concurrent._
   import scala.io._
-  import scala.sys.process._
   import java.io._
 
   protected val stdin = new SyncVar[OutputStream]
@@ -28,5 +39,7 @@ abstract class InteractiveProcess(command: String) {
     if (stdout.isSet) stdout.take()
     process.foreach(_.destroy())
   }
+
+  def eval(cmd: String): String
 
 }

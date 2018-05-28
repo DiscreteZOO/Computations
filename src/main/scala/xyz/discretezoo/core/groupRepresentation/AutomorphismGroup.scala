@@ -1,4 +1,4 @@
-package xyz.discretezoo.core.polytopes.groupRepresentation
+package xyz.discretezoo.core.groupRepresentation
 
 import xyz.discretezoo.core.externalprocess.Lowx
 
@@ -20,39 +20,16 @@ trait AutomorphismGroup {
 
   private def intToChar(i: Int): Char = (i - 1 + 'a'.toInt).toChar
 
-  /*
-  * Code generators
-  * */
-
-  abstract class CodeIO[T](protected val labels: Map[Generator, T],
-                           stringify: T => String,
-                           parenthesizeExponent: Boolean = false) {
-
-    private def toCode(list: Seq[(Generator, Int)]) = {
-      list.map(pair => (labels.get(pair._1), pair._2, parenthesizeExponent) match {
-        case (Some(c), 1, _) => s"${stringify(c)}"
-        case (Some(c), i, p) if !p || i < 10 => s"${stringify(c)}^$i"
-        case (Some(c), i, true) => s"${stringify(c)}^{$i}"
-        case _ => ""
-      }).filter(_.nonEmpty).mkString("*")
-    }
-
-    protected def gpComponentCode(components: Seq[GroupComponent]): String = components.map(c => toCode(c match {
-      case g: Generator => Seq((g, 1))
-      case r: Relator => r.relation
-    })).mkString(", ")
-
-  }
-
+  /* GAP object
+   */
   object GAP extends CodeIO(generatorMap, (i: Int) => s"$groupName.$i") {
 
-    val code: String =
-      s"""Free$groupName := FreeGroup("${generatorMap.values.map(i => s"g$i").mkString("\", \"")}");;"""
+    val code: String = s""""""
 
-    def quotientCode(relators: Set[Relator]): String =
-      s"$groupName := Free$groupName / [ ${gpComponentCode(getRelations.toSeq)}, ${gpComponentCode(relators.toSeq)} ];"
+    val resources = "external/gap/"
+    val newline = """\n"""
 
-    private def getIntersectionConditions: Set[String] = {
+    private def intersectionConditions: Set[String] = {
       def subgroup(s: Set[Generator]) = s"Subgroup($groupName, [ ${gpComponentCode(s.toSeq)} ])"
       //TODO add conditions for |I| = n − 1
       N.subsets().toSet.subsets(2).map(x => (Gamma(x.head), Gamma(x.last), Gamma(x.head.union(x.last))))
@@ -63,8 +40,26 @@ trait AutomorphismGroup {
       }).toSet
     }
 
+    def setupForEpimorphismsToGpOrder(order: Int): String =
+      s"""
+         |Reread("${resources}improved_gquotient.g");
+         |$groupName := FreeGroup("${generatorMap.values.map(i => s"g$i").mkString("\", \"")}");;
+         |$groupName := $groupName / [ ${gpComponentCode(getRelations.toSeq)} ];;
+         |for G in AllSmallGroups($order) do
+         |    Print(IdSmallGroup(G)[2], "${newline}");
+         |    smallGroup := Image(IsomorphismPermGroup(G));;
+         |    Q := GQuotients(G3, smallGroup);;
+         |    if Length(Q) > 0 then
+         |        smaller := SmallerDegreePermutationRepresentation(smallGroup);;
+         |        View(List(Q, hom -> List(GeneratorsOfGroup(G3), x -> Image(smaller, Image(hom, x)))));
+         |        Print("${newline}");
+         |    fi;
+         |od;;
+       """.stripMargin
   }
 
+  /* LOWX object
+   */
   object LOWX extends CodeIO(generatorMap.map(t => (t._1, intToChar(t._2))), (c: Char) => c.toString) {
 
     val charToGenerator: Map[Char, Generator] = generatorMap.map(t => (intToChar(t._2), t._1))
@@ -82,6 +77,8 @@ trait AutomorphismGroup {
 
   }
 
+  /* LaTeX object
+   */
   object LaTeX extends CodeIO(generatorNames, identity[String], parenthesizeExponent = true) {
     def code: String = s"$className: $$< ${getGenerators.mkString(", ")} | ${gpComponentCode(getRelations.toSeq)} >$$"
   }

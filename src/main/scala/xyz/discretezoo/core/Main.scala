@@ -1,33 +1,61 @@
 package xyz.discretezoo.core
 
-import externalprocess.{Gap, Lowx}
-import xyz.discretezoo.core.polytopes.P2orbit
+import java.io.File
 
+import externalprocess.{GapBatch, Lowx}
+import maniplexes.{M2orbit, ManiplexData}
+import xyz.discretezoo.core.db.maniplexes.Util.GAPHomomorphismList
+
+import scala.io.Source
 
 object Main {
 
   def main(args: Array[String]): Unit = {
 
-//    val gapProcess = new Gap
-//    println(result)
-//    println(gapProcess.eval("1+1;"))
-//    println(gapProcess.eval("2+2;"))
-//    gapProcess.close()
+    val P = new M2orbit(3, Set(1))
+//    println(P.GAP.setupForEpimorphismsToGpOrder(10))
 
-    val P = new P2orbit(3, Set(1))
-//    println(P.LOWX.code)
-    val lowxOut = P.LOWX.get(40).last
-    println(P.GAP.code)
-    println(s"index: ${lowxOut._1}")
-    println(P.GAP.quotientCode(lowxOut._2.toSet))
+//    val t0 = System.nanoTime()
+//    val lowx = new Lowx(P.LOWX.code, 70).runAndGetSubgroups // 1h
+//    val t1 = System.nanoTime()
+//    println(t1 - t0)
 
-//    Range(0, 3).toSet.subsets().filter(s => s.nonEmpty && s.size < 3).foreach(s => {
-//      println("\n - - - - - ")
-//      println(s)
-//      val P2 = new P2orbit(3, s)
-//      println(P2.GAP.get)
-//      P2.GAP.getIntersectionConditions.foreach(println)
-//    })
+//    println(P.GAP.setupForEpimorphismsToGpOrder(50))
+
+    // arguments: I, from order, to order
+//    computeManiplexes(3, args(0).split(",").map(_.toInt).toSet, args(1).toInt, args(2).toInt)
+//    getResources("results").foreach(println)
+
+    val fileIterator = Source.fromFile("test.txt").getLines().mkString
+    val test = new GAPHomomorphismList(fileIterator.filter(_ > ' '))
+    test.InputLine.run()
+
+  }
+
+  /* Run with parameters
+  - - - - - - - - - - - - - - - -
+    Ctrl + Alt + r
+    e
+    Enter
+    Program arguments: Write your command line parameters (space between each item)
+    Enter
+    */
+  def computeManiplexes(rank: Int, I: Set[Int], from: Int, to: Int): Unit = {
+    val M = new M2orbit(rank, I)
+    Range(from, to + 1).filter(_ % 2 == 0).foreach(gpOrder => {
+      println(s"generating order $gpOrder")
+      val outputFileName = s"P2.$rank.${I.mkString("-")}.$gpOrder.txt"
+      val code = M.GAP.setupForEpimorphismsToGpOrder(gpOrder)
+      new GapBatch(code, outputFileName).run()
+    })
+  }
+
+  def getResources(directory: String): Seq[ManiplexData] = {
+    val d = new File("results")
+    if (d.exists && d.isDirectory)
+      d.listFiles.filter(_.isFile).map(file => ManiplexData.fromFileName(file.getName)).toSeq.sorted
+    else
+      Seq()
   }
 
 }

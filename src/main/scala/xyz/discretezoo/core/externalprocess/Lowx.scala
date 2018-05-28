@@ -1,6 +1,6 @@
 package xyz.discretezoo.core.externalprocess
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import scala.math.log10
 
 class Lowx(group: String, maxIndex: Int, normalSubgroups: Boolean = true) extends BatchProcess("lowx")  {
@@ -15,8 +15,6 @@ class Lowx(group: String, maxIndex: Int, normalSubgroups: Boolean = true) extend
   }
 
   private def inputTempFile(): File = {
-    import java.io.File
-    import java.io.PrintWriter
     val inputTempFile = File.createTempFile("discreteZOOtemp", ".lx")
     val printWriter = new PrintWriter(inputTempFile)
     try printWriter.write(generateInput()) finally printWriter close()

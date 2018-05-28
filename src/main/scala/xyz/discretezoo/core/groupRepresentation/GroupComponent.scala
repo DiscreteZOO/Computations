@@ -1,4 +1,4 @@
-package xyz.discretezoo.core.polytopes.groupRepresentation
+package xyz.discretezoo.core.groupRepresentation
 
 import scala.annotation.tailrec
 

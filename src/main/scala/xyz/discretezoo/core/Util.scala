@@ -17,4 +17,5 @@ object Util {
   def countConsecutive[T](seq: Seq[T]): Seq[Tuple2[T, Int]] = {
     sliceConsecutive(seq).map(segment => Tuple2(segment.head, segment.length))
   }
+
 }
