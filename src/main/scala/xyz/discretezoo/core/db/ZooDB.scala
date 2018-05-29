@@ -2,7 +2,7 @@ package xyz.discretezoo.core.db
 
 //import slick.jdbc.PostgresProfile.api._
 import xyz.discretezoo.core.db.ZooPostgresProfile.api._
-import xyz.discretezoo.core.db.maniplexes.{Maniplex, Maniplexes}
+import xyz.discretezoo.core.db.Maniplex
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
