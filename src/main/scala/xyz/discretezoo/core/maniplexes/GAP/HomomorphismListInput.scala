@@ -1,5 +1,7 @@
 package xyz.discretezoo.core.maniplexes.GAP
 
+import java.util.UUID
+
 import xyz.discretezoo.core.GAP.HomomorphismListParser._
 import xyz.discretezoo.core.db.{Maniplex, ZooDB}
 import xyz.discretezoo.core.maniplexes.ManiplexData
@@ -38,21 +40,6 @@ object HomomorphismListInput {
 
   /** Produces a sequence of database maniplex objects from the parsed GAP output */
   private def parseHomomorphismList(data: ManiplexData, s: String, smallGroupId: Int) = {
-    val homomorphismList = deserializeHomomorphism(s)
-    val groupDegree = homomorphismList.map(homomorphism => homomorphism.map(_.max).max).max // largest point moved
-    homomorphismList.filter(isValidHomomorphism).map(images => {
-      Maniplex(
-        uuid            = None,
-        id              = 0,
-        rank            = data.rank,
-        symmetryType    = data.I.mkString(","),
-        smallGroupOrder = data.groupOrder,
-        smallGroupId    = smallGroupId,
-        generators      = images.map(_.ofDegree(groupDegree).permutation.toList).toList,
-        flagGraph       = "",
-        underlyingGraph = ""
-      )
-    })
 
     /** Checks if the homomorphism produces a degenerate maniplex */
     def isValidHomomorphism(homomorphism: Seq[Permutation]): Boolean = {
@@ -62,6 +49,21 @@ object HomomorphismListInput {
         !M.generatorsAllowedToMapToID.contains(t._2 + 1) // selects those that must not be identity
       }).forall(t => t._1 != Identity) //none of the selected can be identity
     }
+
+    val homomorphismList = deserializeHomomorphism(s)
+    val groupDegree = homomorphismList.map(homomorphism => homomorphism.map(_.max).max).max // largest point moved
+    homomorphismList.filter(isValidHomomorphism).map(images => {
+      Maniplex(
+        uuid            = UUID.randomUUID(),
+        rank            = data.rank,
+        symmetryType    = data.I.mkString(","),
+        smallGroupOrder = data.groupOrder,
+        smallGroupId    = smallGroupId,
+        generators      = images.map(_.ofDegree(groupDegree).permutation.toList).toList,
+        flagGraph       = "",
+        underlyingGraph = ""
+      )
+    })
   }
 
 }

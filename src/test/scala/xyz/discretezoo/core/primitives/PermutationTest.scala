@@ -1,7 +1,6 @@
 package xyz.discretezoo.core.primitives
 
 import org.scalatest.{FlatSpec, PrivateMethodTester}
-import xyz.discretezoo.core.primitives.ActualPermutation
 
 class PermutationTest extends FlatSpec with PrivateMethodTester {
 

@@ -5,8 +5,7 @@ import java.util.UUID
 import xyz.discretezoo.core.db.ZooPostgresProfile.api._
 
 case class Maniplex(
-                     uuid: Option[UUID],
-                     id: Long,
+                     uuid: UUID,
                      rank: Int,
                      symmetryType: String,
                      smallGroupOrder: Int,
@@ -18,7 +17,6 @@ case class Maniplex(
 class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
 
   def uuid = column[UUID]("UUID", O.PrimaryKey)
-  def id = column[Long]("ID", O.PrimaryKey)
   def rank = column[Int]("RANK")
   def symmetryType = column[String]("SYMMETRY_TYPE") // the set I for 1-orbit maniplexes
   def smallGroupOrder = column[Int]("SMALL_GROUP_ORDER")
@@ -28,8 +26,7 @@ class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
   def underlyingGraph = column[String]("UNDERLYING_GRAPH")
 
   def * = (
-    uuid.?,
-    id,
+    uuid,
     rank,
     symmetryType,
     smallGroupOrder,

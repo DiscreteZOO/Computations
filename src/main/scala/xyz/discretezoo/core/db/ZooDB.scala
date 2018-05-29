@@ -16,6 +16,16 @@ object ZooDB {
     null,
     "org.postgresql.Driver")
 
+  def createTables(): Unit = {
+    val db = connect
+    try {
+      val schema = TableQuery[Maniplexes].schema
+      val setup = DBIO.seq(schema.create)
+      val setupFuture = db.run(setup)
+      Await.result(setupFuture, 5L.seconds)
+    } finally db.close
+  }
+
   def insertManiplexes(input: Seq[Maniplex]): Unit = {
     val db = connect
     try {
