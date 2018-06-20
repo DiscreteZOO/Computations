@@ -1,8 +1,8 @@
 package xyz.discretezoo.core.groupRepresentation
 
-abstract class CodeIO[T](protected val labels: Map[Generator, T],
-                         stringify: T => String,
-                         parenthesizeExponent: Boolean = false) {
+abstract class GeneratorCodeIO[T](protected val labels: Map[Generator, T],
+                                  stringify: T => String,
+                                  parenthesizeExponent: Boolean = false) {
 
   private def toCode(list: Seq[(Generator, Int)]) = {
     list.map(pair => (labels.get(pair._1), pair._2, parenthesizeExponent) match {

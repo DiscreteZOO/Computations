@@ -3,7 +3,9 @@ package xyz.discretezoo.core.maniplexes.GAP
 import java.util.UUID
 
 import xyz.discretezoo.core.GAP.HomomorphismListParser._
+import xyz.discretezoo.core.GAP.HomomorphismWithProperties
 import xyz.discretezoo.core.db.{Maniplex, ZooDB}
+import xyz.discretezoo.core.maniplexes.M2orbit.M2orbitManiplex
 import xyz.discretezoo.core.maniplexes.ManiplexData
 import xyz.discretezoo.core.primitives.{Identity, Permutation}
 
@@ -41,27 +43,19 @@ object HomomorphismListInput {
   /** Produces a sequence of database maniplex objects from the parsed GAP output */
   private def parseHomomorphismList(data: ManiplexData, s: String, smallGroupId: Int) = {
 
-    /** Checks if the homomorphism produces a degenerate maniplex */
-    def isValidHomomorphism(homomorphism: Seq[Permutation]): Boolean = {
-      val M = data.toM2orbit
-      // TODO test if all generators are mapped ok
-      homomorphism.zipWithIndex.filter(t => { // zips each generator image with its index
-        !M.generatorsAllowedToMapToID.contains(t._2 + 1) // selects those that must not be identity
-      }).forall(t => t._1 != Identity) //none of the selected can be identity
-    }
-
-    val homomorphismList = deserializeHomomorphism(s)
-    val groupDegree = homomorphismList.map(homomorphism => homomorphism.map(_.max).max).max // largest point moved
-    homomorphismList.filter(isValidHomomorphism).map(images => {
+    val homomorphismList = deserializeHomomorphisms(s)
+    val groupDegree = homomorphismList.map(homomorphism => homomorphism.homomorphism.map(_.max).max).max // largest point moved
+    homomorphismList.map(hp => {
       Maniplex(
         uuid            = UUID.randomUUID(),
         rank            = data.rank,
-        symmetryType    = data.I.mkString(","),
+        symmetryType    = M2orbitManiplex.serialiseSymmetryType(data.I),
         smallGroupOrder = data.groupOrder,
         smallGroupId    = smallGroupId,
-        generators      = images.map(_.ofDegree(groupDegree).permutation.toList).toList,
+        generators      = hp.homomorphism.map(_.ofDegree(groupDegree).permutation.toList).toList,
         flagGraph       = "",
-        underlyingGraph = ""
+        underlyingGraph = "",
+        orbits          = hp.orbits
       )
     })
   }

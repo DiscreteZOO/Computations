@@ -44,4 +44,12 @@ class PermutationTest extends FlatSpec with PrivateMethodTester {
     assert(ActualPermutation(Seq(2, 1, 3, 5, 6, 4)) === ActualPermutation.fromCycleNotation(Seq(Seq(1, 2), Seq(4, 5, 6))))
   }
 
+  // asCycles
+
+  it should "only have cycles of length at least 2" in {
+    assert(ActualPermutation(Seq(1, 2, 3)).asCycles === Seq())
+    assert(ActualPermutation(Seq(2, 3, 1)).asCycles === Seq(Seq(1, 2, 3)))
+    assert(ActualPermutation(Seq(2, 1, 3, 5, 6, 4)).asCycles === Seq(Seq(1, 2), Seq(4, 5, 6)))
+  }
+
 }

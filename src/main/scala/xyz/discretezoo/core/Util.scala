@@ -1,5 +1,7 @@
 package xyz.discretezoo.core
 
+import xyz.discretezoo.core.maniplexes.M2orbit.M2orbitManiplex
+
 import scala.annotation.tailrec
 
 object Util {

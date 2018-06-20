@@ -5,14 +5,15 @@ import java.util.UUID
 import xyz.discretezoo.core.db.ZooPostgresProfile.api._
 
 case class Maniplex(
-                     uuid: UUID,
-                     rank: Int,
-                     symmetryType: String,
-                     smallGroupOrder: Int,
-                     smallGroupId: Int,
-                     generators: List[List[Int]], // TODO
-                     flagGraph: String,
-                     underlyingGraph: String)
+  uuid: UUID,
+  rank: Int,
+  symmetryType: String,
+  smallGroupOrder: Int,
+  smallGroupId: Int,
+  generators: List[List[Int]],
+  flagGraph: String,
+  underlyingGraph: String,
+  orbits: Int)
 
 class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
 
@@ -24,6 +25,7 @@ class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
   def generators = column[List[List[Int]]]("GENERATORS")
   def flagGraph = column[String]("FLAG_GRAPH")
   def underlyingGraph = column[String]("UNDERLYING_GRAPH")
+  def orbits = column[Int]("ORBITS")
 
   def * = (
     uuid,
@@ -33,6 +35,7 @@ class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
     smallGroupId,
     generators,
     flagGraph,
-    underlyingGraph
+    underlyingGraph,
+    orbits
   ) <> (Maniplex.tupled, Maniplex.unapply)
 }

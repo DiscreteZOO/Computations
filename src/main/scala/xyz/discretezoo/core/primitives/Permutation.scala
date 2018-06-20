@@ -1,14 +1,18 @@
 package xyz.discretezoo.core.primitives
 
+import scala.annotation.tailrec
+
 sealed trait Permutation {
   def max: Int
   def ofDegree(degree: Int): ActualPermutation
+  def asCycles: Seq[Seq[Int]]
 }
 
 object Identity extends Permutation {
   override def max = 0
   override def ofDegree(degree: Int): ActualPermutation = ActualPermutation(Range(1, degree + 1))
   override def toString: String = "Id"
+  override def asCycles: Seq[Seq[Int]] = Seq()
 }
 
 case class ActualPermutation(permutation: Seq[Int]) extends Permutation {
@@ -22,6 +26,28 @@ case class ActualPermutation(permutation: Seq[Int]) extends Permutation {
   }
 
   override def toString: String = s"Permutation(${permutation.mkString(", ")})"
+
+  override def asCycles: Seq[Seq[Int]] = {
+    val map = permutation.zipWithIndex.map(t => (t._2 + 1, t._1)).toMap
+
+    @tailrec def getCycle(accumulated: Seq[Int]): Seq[Int] = {
+      val maybeNext = map(accumulated.last)
+      if (accumulated.head == maybeNext) accumulated
+      else getCycle(accumulated :+ maybeNext)
+    }
+
+    @tailrec def getCycles(accumulated: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+      val used = accumulated.flatten.toSet
+      val remaining = map.values.toSet.diff(used)
+      if (remaining.isEmpty) accumulated
+      else getCycles(accumulated :+ getCycle(Seq(remaining.min)))
+    }
+
+    getCycles(Seq()).filter(_.length > 1)
+  }
+
+  def isIdentity: Boolean = permutation.zipWithIndex.forall(t => t._1 == t._2 + 1)
+
 }
 
 object ActualPermutation {
