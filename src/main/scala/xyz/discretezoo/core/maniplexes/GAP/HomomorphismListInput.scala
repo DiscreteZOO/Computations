@@ -27,36 +27,32 @@ object HomomorphismListInput {
     var smallGroupId = 0
     var collector = ""
 
+    def insert(): Unit = ZooDB.insertManiplexes(parseHomomorphismList(data, collector, smallGroupId))
+
     for (line <- fileIterator) {
       // if current line is a number, store the collected lines
-      if (line.forall(_.isDigit)) {
-        if (smallGroupId != 0) ZooDB.insertManiplexes(parseHomomorphismList(data, collector, smallGroupId))
-        collector = ""
-        smallGroupId = line.toInt
-      }
-      else {
-        collector += line
+      if (line.nonEmpty) {
+        if (line.forall(_.isDigit)) {
+          if (smallGroupId != 0 && collector.nonEmpty) insert()
+          collector = ""
+          smallGroupId = line.toInt
+        }
+        else {
+          collector += line
+        }
       }
     }
+    // store any remaining collected lines
+    if (collector.nonEmpty) insert()
   }
 
   /** Produces a sequence of database maniplex objects from the parsed GAP output */
-  private def parseHomomorphismList(data: ManiplexData, s: String, smallGroupId: Int) = {
+  private def parseHomomorphismList(data: ManiplexData, s: String, smallGroupId: Int): Seq[Maniplex] = {
 
     val homomorphismList = deserializeHomomorphisms(s)
     val groupDegree = homomorphismList.map(homomorphism => homomorphism.homomorphism.map(_.max).max).max // largest point moved
     homomorphismList.map(hp => {
-      Maniplex(
-        uuid            = UUID.randomUUID(),
-        rank            = data.rank,
-        symmetryType    = M2orbitManiplex.serialiseSymmetryType(data.I),
-        smallGroupOrder = data.groupOrder,
-        smallGroupId    = smallGroupId,
-        generators      = hp.homomorphism.map(_.ofDegree(groupDegree).permutation.toList).toList,
-        flagGraph       = "",
-        underlyingGraph = "",
-        orbits          = hp.orbits
-      )
+      Maniplex(uuid            = UUID.randomUUID(), flagGraph       = "", generators      = hp.homomorphism.map(_.ofDegree(groupDegree).permutation.toList).toList, orbits          = hp.orbits, rank            = data.rank, smallGroupId    = smallGroupId, smallGroupOrder = data.groupOrder, symmetryType    = M2orbitManiplex.serialiseSymmetryType(data.I), underlyingGraph = "")
     })
   }
 

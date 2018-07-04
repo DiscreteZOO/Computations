@@ -6,7 +6,7 @@ import scala.math.Ordering.Implicits._
 
 case class ManiplexData(rank: Int, I: Set[Int], groupOrder: Int) {
   private def comparable: (Int, Seq[Int], Int) = (rank, I.toSeq.sorted, groupOrder)
-  def toM2orbit: M2orbitManiplex = new M2orbitManiplex(rank, I)
+  def toM2orbitManiplex: M2orbitManiplex = new M2orbitManiplex(rank, I)
   def serialised: String = s"M2.$rank.${M2orbitManiplex.serialiseSymmetryType(I)}.$groupOrder"
 }
 

@@ -13,26 +13,37 @@ import xyz.discretezoo.core.MAGMA.GraphCovers
 import xyz.discretezoo.core.db.{Maniplex, Maniplexes, ZooDB}
 import xyz.discretezoo.core.maniplexes.GAP.HomomorphismListInput
 import xyz.discretezoo.core.maniplexes.M2orbit.M2orbitManiplex
+import xyz.discretezoo.core.primitives.ActualPermutation
 import xyz.discretezoo.core.util.DZConfig
 
 object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val M = new M2orbitManiplex(3, Set(1))
-    println(s"""outputFile := IO_File("test.108.txt", "w");; ${M.codeSnippetsGAP.automorphismGroupsGAP(108)} IO_Close(outputFile);;""")
-
-    // TODO: external/gap/improved_gquotient.g in GAP code
+//    val M = new M2orbitManiplex(3, Set(0, 1))
+//    println(M.generatorMap)
+//    M.generatorNames.foreach(println)
+//    println(s"""outputFile := IO_File("test.txt", "w");; ${M.GAPCodeSnippets.automorphismGroupsGAP(16)} IO_Close(outputFile);;""")
 
     // Get GAP output txts
     // arguments: I, from order, to order
-//    computeManiplexes(3, M2orbit.deserialiseSymmetryType(args(0)), args(1).toInt, args(2).toInt)
-//    getResources(outputDirectory, (s: String) => s.endsWith(".txt")).foreach(println)
+//    computeManiplexes(3, M2orbitManiplex.deserialiseSymmetryType(args(0)), args(1).toInt, args(2).toInt)
+//    getResources(DZConfig.outputResultsGAP, (s: String) => s.endsWith(".txt")).foreach(println)
 
+//    computeManiplexes(4, Set(0, 1), 63, 100)
+
+    println("test")
 //    ZooDB.createTables()
-//    HomomorphismListInput.fileToDB("maniplexes/gap/output/M2.3.1.18.txt")
+//    HomomorphismListInput.fileToDB(DZConfig.outputResultsGAP + "/M2.3.1.2.txt")
 
-//    val fileIterator = Source.fromFile("test1.txt").getLines().mkString.filter(_ > ' ')
+//    HomomorphismListInput.fileToDB(s"${DZConfig.outputResultsGAP}/M2.4.0-1.58.txt")
+
+//    outputFilesToDB(
+//      DZConfig.outputResultsGAP,
+//      (s: String) => s.endsWith(".txt"),
+//      (MD: ManiplexData) => true)
+
+//    val fileIterator = Source.fromFile("test.txt").getLines().mkString.filter(_ > ' ')
 //    val test = HomomorphismListParser.deserializeTest(fileIterator)
 //    println(test)
 
@@ -41,6 +52,48 @@ object Main {
 //    val lowx = new Lowx(P.LOWX.code, 70).runAndGetSubgroups // 1h
 //    val t1 = System.nanoTime()
 //    println(t1 - t0)
+
+//    makeFlagGraphs()
+
+//    val maniplex = (
+//      UUID.fromString("c987bb99-5dbe-4ba5-8b80-d1e62ccd4918"),
+//      ManiplexData(3,Set(1),8),
+//      List(List(3, 4, 1, 2), List(2, 1, 4, 3), List(3, 2, 1, 4), List(1, 4, 3, 2)))
+//
+//    val voltages = maniplex._2.toM2orbitManiplex.voltagesMap
+//
+//    def getListGAP(m: Map[Int, Int]): String = m.map(p => s"[${p._1}, ${p._2}]").mkString("[", ", ", "]")
+//
+//    val code =
+//      s"""getMatching := function(G, element, orbit, label)
+//         |  local matching, S, i, v, w, e;
+//         |  matching := [];
+//         |  S := Set(G);
+//         |  for i in [1..Length(S)/2] do
+//         |    v := S[1];
+//         |    w := v * element;
+//         |    Add(matching, [v, w]);
+//         |    Remove(S, Position(S, w));
+//         |    Remove(S, 1);
+//         |  od;
+//         |  for e in matching do
+//         |    View([[e[1], orbit], [e[2], orbit], label]);
+//         |  od;;
+//         |end;
+//         |
+//         |G := Group(${maniplex._3.map(ActualPermutation(_).GAP).mkString(", ")});;
+//         |gens := GeneratorsOfGroup(G);
+//         |rhos := ${getListGAP(voltages._1)};;
+//         |alpha2 := ${getListGAP(voltages._2)};;
+//         |alpha3 := ${getListGAP(voltages._3)};;
+//         |
+//         |for r in rhos do getMatching(G, gens[r[1]], 1, r[2]);; od;;
+//         |for a in alpha3 do getMatching(G, gens[a[1]], 2, r[2]);; od;;
+//       """.stripMargin
+//
+//    println(code)
+
+
 
   }
 
@@ -58,19 +111,30 @@ object Main {
       println(s"generating order $gpOrder")
       val mData = ManiplexData(rank, I, gpOrder)
       val outputFileName = s"${mData.serialised}.txt"
-      val code = M.codeSnippetsGAP.automorphismGroupsGAP(gpOrder)
+      val code = M.GAPCodeSnippets.automorphismGroupsGAP(gpOrder)
       new GapBatch(code, DZConfig.outputResultsGAP + "/" + outputFileName).run()
     })
   }
 
   def getResources(directory: String, filter: Function1[String, Boolean]): Seq[ManiplexData] = {
-    val d = new File(DZConfig.outputResultsGAP)
+    val d = new File(directory)
     if (d.exists && d.isDirectory) {
       d.listFiles.filter(_.isFile).map(_.getName).filter(filter)
         .map(fileName => ManiplexData.fromFileName(fileName)).toSeq.sorted
     }
     else {
       Seq()
+    }
+  }
+
+  def outputFilesToDB(directory: String, fileFilter: Function1[String, Boolean], maniplexFilter: Function1[ManiplexData, Boolean]): Unit = {
+    val d = new File(directory)
+    if (d.exists && d.isDirectory) {
+      d.listFiles.filter(_.isFile).map(_.getName).filter(fileFilter)
+        .filter(fileName => maniplexFilter(ManiplexData.fromFileName(fileName))).foreach(fileName => {
+        println(fileName)
+        HomomorphismListInput.fileToDB(s"$directory/$fileName")
+      })
     }
   }
 
@@ -82,5 +146,11 @@ object Main {
       try printWriter.write(GC.code(s"${DZConfig.outputResultsMAGMA}$fileName.txt")) finally printWriter close()
     })
   }
+
+//  def makeFlagGraphs(): Unit = {
+//    ZooDB.getManiplexes.foreach(m => {
+//      if (m._2.groupOrder < 10) println(m._3.map())
+//    })
+//  }
 
 }

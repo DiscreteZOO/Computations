@@ -6,6 +6,7 @@ sealed trait Permutation {
   def max: Int
   def ofDegree(degree: Int): ActualPermutation
   def asCycles: Seq[Seq[Int]]
+  def GAP: String
 }
 
 object Identity extends Permutation {
@@ -13,6 +14,7 @@ object Identity extends Permutation {
   override def ofDegree(degree: Int): ActualPermutation = ActualPermutation(Range(1, degree + 1))
   override def toString: String = "Id"
   override def asCycles: Seq[Seq[Int]] = Seq()
+  override def GAP: String = "()"
 }
 
 case class ActualPermutation(permutation: Seq[Int]) extends Permutation {
@@ -48,6 +50,8 @@ case class ActualPermutation(permutation: Seq[Int]) extends Permutation {
 
   def isIdentity: Boolean = permutation.zipWithIndex.forall(t => t._1 == t._2 + 1)
 
+  override def GAP: String = asCycles.map(_.mkString("(", ",", ")")).mkString
+
 }
 
 object ActualPermutation {
@@ -79,3 +83,10 @@ object ActualPermutation {
   }
 
 }
+
+//val setSize = this.permutation.size
+//
+//require(this.permutation.keySet == this.permutation.values.toSet, "The argument is not a permutation")
+//require(this.permutation.keySet == Range(0, setSize).toSet, "A permutation on " + setSize + " elements must be defined on the set {0, ..., " + (setSize-1) + "}.")
+//
+//def apply(_1: Int) = permutation(_1)
