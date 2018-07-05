@@ -20,6 +20,8 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
+    ZooDB.getGraphs.foreach(println)
+
 //    val M = new M2orbitManiplex(3, Set(0, 1))
 //    println(M.generatorMap)
 //    M.generatorNames.foreach(println)
@@ -32,11 +34,9 @@ object Main {
 
 //    computeManiplexes(4, Set(0, 1), 63, 100)
 
-    println("test")
+//    println("test")
 //    ZooDB.createTables()
 //    HomomorphismListInput.fileToDB(DZConfig.outputResultsGAP + "/M2.3.1.2.txt")
-
-//    HomomorphismListInput.fileToDB(s"${DZConfig.outputResultsGAP}/M2.4.0-1.58.txt")
 
 //    outputFilesToDB(
 //      DZConfig.outputResultsGAP,

@@ -4,6 +4,7 @@ import java.util.UUID
 
 import com.sun.net.httpserver.Authenticator.Success
 import xyz.discretezoo.core.db.ZooPostgresProfile.api._
+import xyz.discretezoo.core.db.v1.Graphs
 import xyz.discretezoo.core.maniplexes.M2orbit.M2orbitManiplex
 import xyz.discretezoo.core.maniplexes.ManiplexData
 
@@ -14,6 +15,7 @@ import ExecutionContext.Implicits.global
 
 object ZooDB {
 
+  private val graphs: TableQuery[Graphs] = TableQuery[Graphs]
   private val maniplexes: TableQuery[Maniplexes] = TableQuery[Maniplexes]
 
   private def connect: ZooPostgresProfile.backend.DatabaseDef = Database.forURL(
@@ -50,6 +52,13 @@ object ZooDB {
     Await.result(f, Duration("Inf")).map(m => {
       (m._1, ManiplexData(m._2, M2orbitManiplex.deserialiseSymmetryType(m._3), m._4), m._5)
     })
+  }
+
+  def getGraphs: Seq[(Int, Int, Boolean)] = {
+    val db = connect
+    val q = for (g <- graphs.filter(g => g.order < 10)) yield (g.zooid, g.order, g.isArcTransitive)
+    val f: Future[Seq[(Int, Int, Boolean)]] = db.run(q.result)
+    Await.result(f, Duration("Inf"))
   }
 
 }
