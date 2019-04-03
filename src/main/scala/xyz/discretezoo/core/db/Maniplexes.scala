@@ -10,6 +10,8 @@ case class Maniplex(
   generators: List[List[Int]],
   orbits: Int,
   rank: Int,
+  isPolytope: Boolean,
+  isRegular: Boolean,
   smallGroupId: Int,
   smallGroupOrder: Int,
   symmetryType: String,
@@ -23,6 +25,8 @@ class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
   def generators = column[List[List[Int]]]("GENERATORS")
   def orbits = column[Int]("ORBITS")
   def rank = column[Int]("RANK")
+  def isPolytope = column[Boolean]("IS_POLYTOPE")
+  def isRegular = column[Boolean]("IS_REGULAR")
   def smallGroupId = column[Int]("SMALL_GROUP_ID")
   def smallGroupOrder = column[Int]("SMALL_GROUP_ORDER")
   def symmetryType = column[String]("SYMMETRY_TYPE") // the set I for 1-orbit maniplexes
@@ -34,6 +38,8 @@ class Maniplexes(tag: Tag) extends Table[Maniplex](tag, "maniplexes") {
     generators,
     orbits,
     rank,
+    isPolytope,
+    isRegular,
     smallGroupId,
     smallGroupOrder,
     symmetryType,

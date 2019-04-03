@@ -52,7 +52,18 @@ object HomomorphismListInput {
     val homomorphismList = deserializeHomomorphisms(s)
     val groupDegree = homomorphismList.map(homomorphism => homomorphism.homomorphism.map(_.max).max).max // largest point moved
     homomorphismList.map(hp => {
-      Maniplex(uuid            = UUID.randomUUID(), flagGraph       = "", generators      = hp.homomorphism.map(_.ofDegree(groupDegree).permutation.toList).toList, orbits          = hp.orbits, rank            = data.rank, smallGroupId    = smallGroupId, smallGroupOrder = data.groupOrder, symmetryType    = M2orbitManiplex.serialiseSymmetryType(data.I), underlyingGraph = "")
+      def booleanPropertyValue(name: String): Boolean = hp.properties.filter(_.name == name).map(_.value == "true").head
+      Maniplex(
+        uuid = UUID.randomUUID(),
+        flagGraph = "",
+        generators = hp.homomorphism.map(_.ofDegree(groupDegree).permutation.toList).toList,
+        orbits = hp.orbits,
+        rank = data.rank,
+        isPolytope = booleanPropertyValue("polytope"),
+        isRegular = booleanPropertyValue("regular"),
+        smallGroupId = smallGroupId,
+        smallGroupOrder = data.groupOrder,
+        symmetryType = M2orbitManiplex.serialiseSymmetryType(data.I), underlyingGraph = "")
     })
   }
 

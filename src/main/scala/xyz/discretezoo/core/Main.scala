@@ -20,7 +20,10 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    ZooDB.getGraphs.foreach(println)
+//    ZooDB.getGraphs.foreach(println)
+
+//    val M = new M2orbitManiplex(3, Set(1, 2))
+//    M.generatorMap.foreach(println)
 
 //    val M = new M2orbitManiplex(3, Set(0, 1))
 //    println(M.generatorMap)
@@ -32,19 +35,25 @@ object Main {
 //    computeManiplexes(3, M2orbitManiplex.deserialiseSymmetryType(args(0)), args(1).toInt, args(2).toInt)
 //    getResources(DZConfig.outputResultsGAP, (s: String) => s.endsWith(".txt")).foreach(println)
 
-//    computeManiplexes(4, Set(0, 1), 63, 100)
+    val sets: Seq[Set[Int]] = Seq(Set(0, 2))
+//    sets.foreach(s => {
+//      val M = new M2orbitManiplex(4, s)
+//      println(s, M.generatorMap.size - 1)
+//    })
+//    sets.foreach(s => computeManiplexes(3, s, 149, 150))
+//    computeManiplexes(4, Set(1, 2), 120, 150)
 
 //    println("test")
 //    ZooDB.createTables()
 //    HomomorphismListInput.fileToDB(DZConfig.outputResultsGAP + "/M2.3.1.2.txt")
 
-//    outputFilesToDB(
-//      DZConfig.outputResultsGAP,
-//      (s: String) => s.endsWith(".txt"),
-//      (MD: ManiplexData) => true)
+    outputFilesToDB(
+      DZConfig.outputResultsGAP,
+      (s: String) => s.endsWith(".txt"),
+      (MD: ManiplexData) => MD.rank == 3)
 
 //    val fileIterator = Source.fromFile("test.txt").getLines().mkString.filter(_ > ' ')
-//    val test = HomomorphismListParser.deserializeTest(fileIterator)
+//    val test = HomomorphismListParser.deserializeHomomorphisms(fileIterator)
 //    println(test)
 
     // time lowx

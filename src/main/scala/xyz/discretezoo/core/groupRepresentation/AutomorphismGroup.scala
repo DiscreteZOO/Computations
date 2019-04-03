@@ -14,7 +14,7 @@ trait AutomorphismGroup {
 
   protected val generatorMap: Map[Generator, Int]
   protected def getGenerators: Seq[Generator]
-  protected def Gamma(S: Set[Int]): Set[Generator]
+  protected def intersectionConditions: Map[(Set[Generator], Set[Generator]), Set[Generator]]
 
   protected def subsequences(J: Set[Int], size: Int): Iterator[Seq[Int]] = J.subsets(size).flatMap(_.toSeq.permutations)
 
@@ -30,14 +30,12 @@ trait AutomorphismGroup {
     val code: String = s""""""
     val newline = """\n"""
 
-    def intersectionConditions: Set[String] = {
+    def intersectionConditionsGAP: Set[String] = {
       // H is the name of the group in TestIntersectionCondition
       def subgroup(s: Set[Generator]) = s"Subgroup(H, ${s.map(g => s"g[${generatorMap(g)}]").mkString("[", ", ", "]")})"
-      //TODO add conditions for |I| = n − 1
-      N.flatMap(s => N.subsets(s)).subsets(2).map(x => (Gamma(x.head), Gamma(x.last), Gamma(x.head.union(x.last))))
-      .filter(gammas => gammas._1.nonEmpty && gammas._2.nonEmpty).map(gammas => {
-        val intersection = s"Intersection(${subgroup(gammas._1)}, ${subgroup(gammas._2)})"
-        if (gammas._3.nonEmpty) s"$intersection = ${subgroup(gammas._3)}"
+      intersectionConditions.map(gammas => {
+        val intersection = s"Intersection(${subgroup(gammas._1._1)}, ${subgroup(gammas._1._2)})"
+        if (gammas._2.nonEmpty) s"$intersection = ${subgroup(gammas._2)}"
         else s"Size($intersection) = 1"
       }).toSet[String].map(s => s"  if not $s then return false; fi;")
     }
@@ -49,7 +47,7 @@ trait AutomorphismGroup {
          |Reread("${DZConfig.externalResourcesGAP}improved_gquotient.g");
          |
          |TestIntersectionCondition := function(H, g)
-         |${intersectionConditions.mkString("\n")}
+         |${intersectionConditionsGAP.mkString("\n")}
          |  return true;;
          |end;
          |
